@@ -34,39 +34,39 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 	}
 
 	if err := channel.ExchangeDeclare(
-		exchange,     // name
-		exchangeType, // type
-		true,         // durable
-		false,        // auto-deleted
-		false,        // internal
-		false,        // noWait
-		nil,          // arguments
+		c.rabbitConfig.Exchange,     // name
+		c.rabbitConfig.ExchangeType, // type
+		true,  // durable
+		false, // auto-deleted
+		false, // internal
+		false, // noWait
+		nil,   // arguments
 	); err != nil {
 		return OcrResult{}, err
 	}
 
 	// Reliable publisher confirms require confirm.select support from the
 	// connection.
-	if reliable {
+	if c.rabbitConfig.Reliable {
 		if err := channel.Confirm(false); err != nil {
 			return OcrResult{}, err
 		}
 
 		ack, nack := channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
 
-		defer confirmOne(ack, nack)
+		defer confirmDelivery(ack, nack)
 	}
 
 	if err = channel.Publish(
-		exchange,   // publish to an exchange
-		routingKey, // routing to 0 or more queues
-		false,      // mandatory
-		false,      // immediate
+		c.rabbitConfig.Exchange,   // publish to an exchange
+		c.rabbitConfig.RoutingKey, // routing to 0 or more queues
+		false, // mandatory
+		false, // immediate
 		amqp.Publishing{
 			Headers:         amqp.Table{},
 			ContentType:     "text/plain",
 			ContentEncoding: "",
-			Body:            []byte(body),
+			Body:            []byte(imgUrl),
 			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 			Priority:        0,              // 0-9
 			// a bunch of application/implementation-specific fields
@@ -76,4 +76,13 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 	}
 
 	return OcrResult{}, nil
+}
+
+func confirmDelivery(ack, nack chan uint64) {
+	select {
+	case tag := <-ack:
+		logg.LogTo("OCR_RPC", "confirmed delivery, tag: %v", tag)
+	case tag := <-nack:
+		logg.LogTo("OCR_RPC", "failed to confirm delivery: %v", tag)
+	}
 }
