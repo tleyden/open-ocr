@@ -97,7 +97,7 @@ func (w OcrRpcWorker) Run() error {
 		return err
 	}
 
-	go handle(deliveries, w.done)
+	go w.handle(deliveries, w.done)
 
 	return nil
 }
@@ -118,7 +118,7 @@ func (w *OcrRpcWorker) Shutdown() error {
 	return <-w.done
 }
 
-func handle(deliveries <-chan amqp.Delivery, done chan error) {
+func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) {
 	for d := range deliveries {
 		logg.LogTo(
 			"OCR_WORKER",
@@ -128,7 +128,50 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 			d.Body,
 			d.ReplyTo,
 		)
+
+		engineType := ENGINE_MOCK // TODO: the engine type should be specified in the message
+		ocrEngine := NewOcrEngine(engineType)
+		imgUrl := string(d.Body)
+		ocrResult, err := ocrEngine.ProcessImageUrl(imgUrl)
+		if err != nil {
+			msg := "Error processing image url: %v.  Error: %v"
+			logg.LogError("OCR_WORKER", fmt.Errorf(msg, imgUrl, err))
+			done <- err
+			break
+		}
+
+		err := w.sendRpcResponse(ocrResult, d.ReplyTo)
+		if err != nil {
+			msg := "Error returning ocr result: %v.  Error: %v"
+			logg.LogError("OCR_WORKER", fmt.Errorf(msg, ocrResult, err))
+			done <- err
+			break
+		}
+
 	}
 	logg.LogTo("OCR_WORKER", "handle: deliveries channel closed")
 	done <- nil
+}
+
+func (w *OcrRpcWorker) sendRpcResponse(r ocrResult, replyTo string) error {
+
+	if err = w.channel.Publish(
+		w.rabbitConfig.Exchange,   // publish to an exchange
+		w.rabbitConfig.RoutingKey, // routing to 0 or more queues
+		false, // mandatory
+		false, // immediate
+		amqp.Publishing{
+			Headers:         amqp.Table{},
+			ContentType:     "text/plain",
+			ContentEncoding: "",
+			Body:            []byte(r.Text),
+			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
+			Priority:        0,              // 0-9
+			// a bunch of application/implementation-specific fields
+		},
+	); err != nil {
+		return err
+	}
+	return nil
+
 }

@@ -10,6 +10,7 @@ type OcrRpcClient struct {
 }
 
 type OcrResult struct {
+	Text string
 }
 
 func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
