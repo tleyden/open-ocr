@@ -18,4 +18,5 @@ func NewOcrEngine(engineType OcrEngineType) OcrEngine {
 	case ENGINE_TESSERACT:
 		return &TesseractEngine{}
 	}
+	return nil
 }

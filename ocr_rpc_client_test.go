@@ -17,13 +17,12 @@ func TestOcrRpcClientIntegration(t *testing.T) {
 	// assumes that rabbit mq is running
 
 	rabbitConfig := RabbitConfig{
-		AmqpURI:           "amqp://guest:guest@localhost:5672/",
-		Exchange:          "test-exchange",
-		ExchangeType:      "direct",
-		RoutingKey:        "test-key",
-		Reliable:          true,
-		QueueName:         "test-queue",
-		CallbackQueueName: "callback-queue",
+		AmqpURI:      "amqp://guest:guest@localhost:5672/",
+		Exchange:     "test-exchange",
+		ExchangeType: "direct",
+		RoutingKey:   "test-key",
+		Reliable:     true,
+		QueueName:    "test-queue",
 	}
 
 	// kick off a worker

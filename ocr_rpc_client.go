@@ -48,16 +48,19 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 
 	// declare a callback queue where we will receive rpc responses
 	callbackQueue, err := channel.QueueDeclare(
-		c.rabbitConfig.CallbackQueueName, // name of the queue
+		"",    // name, leave empty and let it be generated
 		true,  // durable
 		false, // delete when usused
-		false, // exclusive
+		true,  // exclusive
 		false, // noWait
 		nil,   // arguments
 	)
 	if err != nil {
 		return OcrResult{}, err
 	}
+	logg.LogTo("OCR_CLIENT", "callbackQueue name: %v", callbackQueue.Name)
+
+	// TODO: subscribe to this callback queue
 
 	// Reliable publisher confirms require confirm.select support from the
 	// connection.

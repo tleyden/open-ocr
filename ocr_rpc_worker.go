@@ -135,15 +135,15 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 		ocrResult, err := ocrEngine.ProcessImageUrl(imgUrl)
 		if err != nil {
 			msg := "Error processing image url: %v.  Error: %v"
-			logg.LogError("OCR_WORKER", fmt.Errorf(msg, imgUrl, err))
+			logg.LogError(fmt.Errorf(msg, imgUrl, err))
 			done <- err
 			break
 		}
 
-		err := w.sendRpcResponse(ocrResult, d.ReplyTo)
+		err = w.sendRpcResponse(ocrResult, d.ReplyTo)
 		if err != nil {
 			msg := "Error returning ocr result: %v.  Error: %v"
-			logg.LogError("OCR_WORKER", fmt.Errorf(msg, ocrResult, err))
+			logg.LogError(fmt.Errorf(msg, ocrResult, err))
 			done <- err
 			break
 		}
@@ -153,13 +153,13 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 	done <- nil
 }
 
-func (w *OcrRpcWorker) sendRpcResponse(r ocrResult, replyTo string) error {
+func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string) error {
 
-	if err = w.channel.Publish(
-		w.rabbitConfig.Exchange,   // publish to an exchange
-		w.rabbitConfig.RoutingKey, // routing to 0 or more queues
-		false, // mandatory
-		false, // immediate
+	if err := w.channel.Publish(
+		w.rabbitConfig.Exchange, // publish to an exchange
+		replyTo,                 // routing to 0 or more queues
+		false,                   // mandatory
+		false,                   // immediate
 		amqp.Publishing{
 			Headers:         amqp.Table{},
 			ContentType:     "text/plain",
@@ -172,6 +172,7 @@ func (w *OcrRpcWorker) sendRpcResponse(r ocrResult, replyTo string) error {
 	); err != nil {
 		return err
 	}
+	logg.LogTo("OCR_WORKER", "sendRpcResponse succeeded")
 	return nil
 
 }
