@@ -8,6 +8,8 @@ import (
 
 func init() {
 	logg.LogKeys["TEST"] = true
+	logg.LogKeys["OCR_CLIENT"] = true
+	logg.LogKeys["OCR_WORKER"] = true
 }
 
 func TestOcrRpcClientIntegration(t *testing.T) {
@@ -20,7 +22,16 @@ func TestOcrRpcClientIntegration(t *testing.T) {
 		ExchangeType: "direct",
 		RoutingKey:   "test-key",
 		Reliable:     true,
+		QueueName:    "test-queue",
 	}
+
+	// kick off a worker
+	// this would normally happen on a different machine ..
+	ocrWorker, err := NewOcrRpcWorker(rabbitConfig)
+	if err != nil {
+		logg.LogTo("TEST", "err: %v", err)
+	}
+	ocrWorker.Run()
 
 	ocrClient, err := NewOcrRpcClient(rabbitConfig)
 	if err != nil {

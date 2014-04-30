@@ -1,0 +1,93 @@
+package ocrworker
+
+import (
+	"github.com/couchbaselabs/logg"
+	"github.com/streadway/amqp"
+)
+
+type OcrRpcWorker struct {
+	rabbitConfig RabbitConfig
+}
+
+func NewOcrRpcWorker(rc RabbitConfig) (*OcrRpcWorker, error) {
+	ocrRpcWorker := &OcrRpcWorker{
+		rabbitConfig: rc,
+	}
+	return ocrRpcWorker, nil
+}
+
+func (w OcrRpcWorker) Run() {
+	logg.LogTo("OCR_WORKER", "Run() called")
+
+	logg.LogTo("OCR_WORKER", "dialing %q", w.rabbitConfig.AmqpURI))
+	c.conn, err = amqp.Dial(amqpURI)
+	if err != nil {
+		return nil, fmt.Errorf("Dial: %s", err)
+	}
+
+	go func() {
+		fmt.Printf("closing: %s", <-c.conn.NotifyClose(make(chan *amqp.Error)))
+	}()
+
+	log.Printf("got Connection, getting Channel")
+	c.channel, err = c.conn.Channel()
+	if err != nil {
+		return nil, fmt.Errorf("Channel: %s", err)
+	}
+
+	log.Printf("got Channel, declaring Exchange (%q)", exchange)
+	if err = c.channel.ExchangeDeclare(
+		exchange,     // name of the exchange
+		exchangeType, // type
+		true,         // durable
+		false,        // delete when complete
+		false,        // internal
+		false,        // noWait
+		nil,          // arguments
+	); err != nil {
+		return nil, fmt.Errorf("Exchange Declare: %s", err)
+	}
+
+	log.Printf("declared Exchange, declaring Queue %q", queueName)
+	queue, err := c.channel.QueueDeclare(
+		queueName, // name of the queue
+		true,      // durable
+		false,     // delete when usused
+		false,     // exclusive
+		false,     // noWait
+		nil,       // arguments
+	)
+	if err != nil {
+		return nil, fmt.Errorf("Queue Declare: %s", err)
+	}
+
+	log.Printf("declared Queue (%q %d messages, %d consumers), binding to Exchange (key %q)",
+		queue.Name, queue.Messages, queue.Consumers, key)
+
+	if err = c.channel.QueueBind(
+		queue.Name, // name of the queue
+		key,        // bindingKey
+		exchange,   // sourceExchange
+		false,      // noWait
+		nil,        // arguments
+	); err != nil {
+		return nil, fmt.Errorf("Queue Bind: %s", err)
+	}
+
+	log.Printf("Queue bound to Exchange, starting Consume (consumer tag %q)", c.tag)
+	deliveries, err := c.channel.Consume(
+		queue.Name, // name
+		c.tag,      // consumerTag,
+		true,       // noAck
+		false,      // exclusive
+		false,      // noLocal
+		false,      // noWait
+		nil,        // arguments
+	)
+	if err != nil {
+		return nil, fmt.Errorf("Queue Consume: %s", err)
+	}
+
+	go handle(deliveries, c.done)
+
+}

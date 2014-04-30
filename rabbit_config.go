@@ -6,4 +6,5 @@ type RabbitConfig struct {
 	ExchangeType string
 	RoutingKey   string
 	Reliable     bool
+	QueueName    string
 }
