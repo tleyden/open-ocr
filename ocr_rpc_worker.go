@@ -122,10 +122,11 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 	for d := range deliveries {
 		logg.LogTo(
 			"OCR_WORKER",
-			"got %dB delivery: [%v] %q",
+			"got %dB delivery: [%v] %q.  Reply to: %v",
 			len(d.Body),
 			d.DeliveryTag,
 			d.Body,
+			d.ReplyTo,
 		)
 	}
 	logg.LogTo("OCR_WORKER", "handle: deliveries channel closed")

@@ -45,6 +45,19 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 		return OcrResult{}, err
 	}
 
+	// declare a callback queue where we will receive rpc responses
+	callbackQueue, err := channel.QueueDeclare(
+		c.rabbitConfig.CallbackQueueName, // name of the queue
+		true,  // durable
+		false, // delete when usused
+		false, // exclusive
+		false, // noWait
+		nil,   // arguments
+	)
+	if err != nil {
+		return OcrResult{}, err
+	}
+
 	// Reliable publisher confirms require confirm.select support from the
 	// connection.
 	if c.rabbitConfig.Reliable {
@@ -69,6 +82,7 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 			Body:            []byte(imgUrl),
 			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 			Priority:        0,              // 0-9
+			ReplyTo:         callbackQueue.Name,
 			// a bunch of application/implementation-specific fields
 		},
 	); err != nil {
