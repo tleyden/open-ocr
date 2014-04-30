@@ -7,6 +7,8 @@ import (
 
 type OcrRpcClient struct {
 	rabbitConfig RabbitConfig
+	connection   *amqp.Connection
+	channel      *amqp.Channel
 }
 
 type OcrResult struct {
@@ -20,21 +22,23 @@ func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 	return ocrRpcClient, nil
 }
 
-func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResult, error) {
+func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResult, error) {
+
+	var err error
 
 	logg.LogTo("OCR_CLIENT", "dialing %q", c.rabbitConfig.AmqpURI)
-	connection, err := amqp.Dial(c.rabbitConfig.AmqpURI)
+	c.connection, err = amqp.Dial(c.rabbitConfig.AmqpURI)
 	if err != nil {
 		return OcrResult{}, err
 	}
-	defer connection.Close()
+	defer c.connection.Close()
 
-	channel, err := connection.Channel()
+	c.channel, err = c.connection.Channel()
 	if err != nil {
 		return OcrResult{}, err
 	}
 
-	if err := channel.ExchangeDeclare(
+	if err := c.channel.ExchangeDeclare(
 		c.rabbitConfig.Exchange,     // name
 		c.rabbitConfig.ExchangeType, // type
 		true,  // durable
@@ -47,7 +51,7 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 	}
 
 	// declare a callback queue where we will receive rpc responses
-	callbackQueue, err := channel.QueueDeclare(
+	callbackQueue, err := c.channel.QueueDeclare(
 		"",    // name, leave empty and let it be generated
 		true,  // durable
 		false, // delete when usused
@@ -61,20 +65,24 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 	logg.LogTo("OCR_CLIENT", "callbackQueue name: %v", callbackQueue.Name)
 
 	// TODO: subscribe to this callback queue
+	err = c.subscribeCallbackQueue(callbackQueue)
+	if err != nil {
+		return OcrResult{}, err
+	}
 
 	// Reliable publisher confirms require confirm.select support from the
 	// connection.
 	if c.rabbitConfig.Reliable {
-		if err := channel.Confirm(false); err != nil {
+		if err := c.channel.Confirm(false); err != nil {
 			return OcrResult{}, err
 		}
 
-		ack, nack := channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
+		ack, nack := c.channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
 
 		defer confirmDelivery(ack, nack)
 	}
 
-	if err = channel.Publish(
+	if err = c.channel.Publish(
 		c.rabbitConfig.Exchange,   // publish to an exchange
 		c.rabbitConfig.RoutingKey, // routing to 0 or more queues
 		false, // mandatory
@@ -94,6 +102,41 @@ func (c OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResul
 	}
 
 	return OcrResult{}, nil
+}
+
+func (c OcrRpcClient) subscribeCallbackQueue(callbackQueue amqp.Queue) error {
+	deliveries, err := c.channel.Consume(
+		callbackQueue.Name, // name
+		tag,                // consumerTag,
+		true,               // noAck
+		false,              // exclusive
+		false,              // noLocal
+		false,              // noWait
+		nil,                // arguments
+	)
+	if err != nil {
+		return err
+	}
+
+	go c.handle(deliveries)
+
+	return nil
+
+}
+
+func (c OcrRpcClient) handle(deliveries <-chan amqp.Delivery) {
+	logg.LogTo("OCR_CLIENT", "looping over deliveries..")
+	for d := range deliveries {
+		logg.LogTo(
+			"OCR_CLIENT",
+			"got %dB delivery: [%v] %q.  Reply to: %v",
+			len(d.Body),
+			d.DeliveryTag,
+			d.Body,
+			d.ReplyTo,
+		)
+
+	}
 }
 
 func confirmDelivery(ack, nack chan uint64) {

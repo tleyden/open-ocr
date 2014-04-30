@@ -155,6 +155,7 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 
 func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string) error {
 
+	logg.LogTo("OCR_WORKER", "sendRpcResponse to: %v", replyTo)
 	if err := w.channel.Publish(
 		w.rabbitConfig.Exchange, // publish to an exchange
 		replyTo,                 // routing to 0 or more queues
