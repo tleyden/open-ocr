@@ -155,15 +155,13 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 
 func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string) error {
 
-	/*
-		if err := w.channel.Confirm(false); err != nil {
-			return err
-		}
+	if err := w.channel.Confirm(false); err != nil {
+		return err
+	}
 
-		ack, nack := w.channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
+	ack, nack := w.channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
 
-		defer confirmDeliveryWorker(ack, nack)
-	*/
+	defer confirmDeliveryWorker(ack, nack)
 
 	logg.LogTo("OCR_WORKER", "sendRpcResponse to: %v", replyTo)
 	if err := w.channel.Publish(
@@ -188,7 +186,6 @@ func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string) error {
 
 }
 
-/*
 func confirmDeliveryWorker(ack, nack chan uint64) {
 	select {
 	case tag := <-ack:
@@ -197,4 +194,3 @@ func confirmDeliveryWorker(ack, nack chan uint64) {
 		logg.LogTo("OCR_WORKER", "failed to confirm delivery: %v", tag)
 	}
 }
-*/
