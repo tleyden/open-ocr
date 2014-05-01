@@ -2,6 +2,7 @@ package ocrworker
 
 import (
 	"github.com/couchbaselabs/logg"
+	"github.com/nu7hatch/gouuid"
 	"github.com/streadway/amqp"
 )
 
@@ -25,6 +26,12 @@ func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResult, error) {
 
 	var err error
+
+	correlationUuidRaw, err := uuid.NewV4()
+	if err != nil {
+		return OcrResult{}, err
+	}
+	correlationUuid := correlationUuidRaw.String()
 
 	logg.LogTo("OCR_CLIENT", "dialing %q", c.rabbitConfig.AmqpURI)
 	c.connection, err = amqp.Dial(c.rabbitConfig.AmqpURI)
@@ -82,7 +89,7 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 	logg.LogTo("OCR_CLIENT", "callbackQueue name: %v", callbackQueue.Name)
 
 	// TODO: subscribe to this callback queue
-	err = c.subscribeCallbackQueue(callbackQueue)
+	err = c.subscribeCallbackQueue(callbackQueue, correlationUuid)
 	if err != nil {
 		return OcrResult{}, err
 	}
@@ -112,7 +119,8 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 			Priority:        0,              // 0-9
 			// ReplyTo:         callbackQueue.Name, Not working
-			ReplyTo: c.rabbitConfig.CallbackRoutingKey,
+			ReplyTo:       c.rabbitConfig.CallbackRoutingKey,
+			CorrelationId: correlationUuid,
 			// a bunch of application/implementation-specific fields
 		},
 	); err != nil {
@@ -122,7 +130,7 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 	return OcrResult{}, nil
 }
 
-func (c OcrRpcClient) subscribeCallbackQueue(callbackQueue amqp.Queue) error {
+func (c OcrRpcClient) subscribeCallbackQueue(callbackQueue amqp.Queue, correlationUuid string) error {
 	deliveries, err := c.channel.Consume(
 		callbackQueue.Name, // name
 		tag,                // consumerTag,
@@ -136,23 +144,27 @@ func (c OcrRpcClient) subscribeCallbackQueue(callbackQueue amqp.Queue) error {
 		return err
 	}
 
-	go c.handle(deliveries)
+	go c.handle(deliveries, correlationUuid)
 
 	return nil
 
 }
 
-func (c OcrRpcClient) handle(deliveries <-chan amqp.Delivery) {
+func (c OcrRpcClient) handle(deliveries <-chan amqp.Delivery, correlationUuid string) {
 	logg.LogTo("OCR_CLIENT", "looping over deliveries..")
 	for d := range deliveries {
-		logg.LogTo(
-			"OCR_CLIENT",
-			"got %dB delivery!!!!!!!: [%v] %q.  Reply to: %v",
-			len(d.Body),
-			d.DeliveryTag,
-			d.Body,
-			d.ReplyTo,
-		)
+		if d.CorrelationId == correlationUuid {
+			logg.LogTo(
+				"OCR_CLIENT",
+				"got %dB delivery!!!!!!!: [%v] %q.  Reply to: %v",
+				len(d.Body),
+				d.DeliveryTag,
+				d.Body,
+				d.ReplyTo,
+			)
+		} else {
+			logg.LogTo("OCR_CLIENT", "ignoring delivery w/ correlation id: %v", d.CorrelationId)
+		}
 
 	}
 }

@@ -140,7 +140,7 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 			break
 		}
 
-		err = w.sendRpcResponse(ocrResult, d.ReplyTo)
+		err = w.sendRpcResponse(ocrResult, d.ReplyTo, d.CorrelationId)
 		if err != nil {
 			msg := "Error returning ocr result: %v.  Error: %v"
 			logg.LogError(fmt.Errorf(msg, ocrResult, err))
@@ -153,7 +153,7 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 	done <- nil
 }
 
-func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string) error {
+func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string, correlationId string) error {
 
 	/*
 		if err := w.channel.Confirm(false); err != nil {
@@ -178,6 +178,7 @@ func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string) error {
 			Body:            []byte(r.Text),
 			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 			Priority:        0,              // 0-9
+			CorrelationId:   correlationId,
 			// a bunch of application/implementation-specific fields
 		},
 	); err != nil {
