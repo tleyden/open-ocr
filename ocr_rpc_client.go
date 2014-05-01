@@ -31,7 +31,10 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 	if err != nil {
 		return OcrResult{}, err
 	}
-	defer c.connection.Close()
+
+	// if we close the connection here, then we screw things up later
+	// when subscribing to callback queue messages
+	// defer c.connection.Close()
 
 	c.channel, err = c.connection.Channel()
 	if err != nil {
