@@ -39,10 +39,6 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 		return OcrResult{}, err
 	}
 
-	// if we close the connection here, then we screw things up later
-	// when subscribing to callback queue messages
-	// defer c.connection.Close()
-
 	c.channel, err = c.connection.Channel()
 	if err != nil {
 		return OcrResult{}, err
@@ -60,36 +56,7 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 		return OcrResult{}, err
 	}
 
-	// declare a callback queue where we will receive rpc responses
-	callbackQueue, err := c.channel.QueueDeclare(
-		c.rabbitConfig.CallbackQueueName, // name
-		true,  // durable
-		false, // delete when usused
-		false, // exclusive
-		false, // noWait
-		nil,   // arguments
-	)
-	if err != nil {
-		return OcrResult{}, err
-	}
-
-	// bind the callback queue to an exchange + routing key
-	if err = c.channel.QueueBind(
-		callbackQueue.Name,                // name of the queue
-		c.rabbitConfig.CallbackRoutingKey, // bindingKey
-		c.rabbitConfig.Exchange,           // sourceExchange
-		false, // noWait
-		nil,   // arguments
-	); err != nil {
-		return OcrResult{}, err
-	}
-
-	// TODO: do we need to bind the callbackQueue to a key??
-
-	logg.LogTo("OCR_CLIENT", "callbackQueue name: %v", callbackQueue.Name)
-
-	// TODO: subscribe to this callback queue
-	err = c.subscribeCallbackQueue(callbackQueue, correlationUuid)
+	err = c.subscribeCallbackQueue(correlationUuid)
 	if err != nil {
 		return OcrResult{}, err
 	}
@@ -130,7 +97,34 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 	return OcrResult{}, nil
 }
 
-func (c OcrRpcClient) subscribeCallbackQueue(callbackQueue amqp.Queue, correlationUuid string) error {
+func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string) error {
+
+	// declare a callback queue where we will receive rpc responses
+	callbackQueue, err := c.channel.QueueDeclare(
+		c.rabbitConfig.CallbackQueueName, // name
+		true,  // durable
+		false, // delete when usused
+		false, // exclusive
+		false, // noWait
+		nil,   // arguments
+	)
+	if err != nil {
+		return err
+	}
+
+	// bind the callback queue to an exchange + routing key
+	if err = c.channel.QueueBind(
+		callbackQueue.Name,                // name of the queue
+		c.rabbitConfig.CallbackRoutingKey, // bindingKey
+		c.rabbitConfig.Exchange,           // sourceExchange
+		false, // noWait
+		nil,   // arguments
+	); err != nil {
+		return err
+	}
+
+	logg.LogTo("OCR_CLIENT", "callbackQueue name: %v", callbackQueue.Name)
+
 	deliveries, err := c.channel.Consume(
 		callbackQueue.Name, // name
 		tag,                // consumerTag,
@@ -144,13 +138,13 @@ func (c OcrRpcClient) subscribeCallbackQueue(callbackQueue amqp.Queue, correlati
 		return err
 	}
 
-	go c.handle(deliveries, correlationUuid)
+	go c.handleRpcResponse(deliveries, correlationUuid)
 
 	return nil
 
 }
 
-func (c OcrRpcClient) handle(deliveries <-chan amqp.Delivery, correlationUuid string) {
+func (c OcrRpcClient) handleRpcResponse(deliveries <-chan amqp.Delivery, correlationUuid string) {
 	logg.LogTo("OCR_CLIENT", "looping over deliveries..")
 	for d := range deliveries {
 		if d.CorrelationId == correlationUuid {
@@ -162,6 +156,10 @@ func (c OcrRpcClient) handle(deliveries <-chan amqp.Delivery, correlationUuid st
 				d.Body,
 				d.ReplyTo,
 			)
+
+			defer c.connection.Close()
+			return
+
 		} else {
 			logg.LogTo("OCR_CLIENT", "ignoring delivery w/ correlation id: %v", d.CorrelationId)
 		}
