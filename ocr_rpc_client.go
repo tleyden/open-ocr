@@ -52,16 +52,30 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 
 	// declare a callback queue where we will receive rpc responses
 	callbackQueue, err := c.channel.QueueDeclare(
-		"",    // name, leave empty and let it be generated
+		c.rabbitConfig.CallbackQueueName, // name
 		true,  // durable
 		false, // delete when usused
-		true,  // exclusive
+		false, // exclusive
 		false, // noWait
 		nil,   // arguments
 	)
 	if err != nil {
 		return OcrResult{}, err
 	}
+
+	// bind the callback queue to an exchange + routing key
+	if err = c.channel.QueueBind(
+		callbackQueue.Name,                // name of the queue
+		c.rabbitConfig.CallbackRoutingKey, // bindingKey
+		c.rabbitConfig.Exchange,           // sourceExchange
+		false, // noWait
+		nil,   // arguments
+	); err != nil {
+		return OcrResult{}, err
+	}
+
+	// TODO: do we need to bind the callbackQueue to a key??
+
 	logg.LogTo("OCR_CLIENT", "callbackQueue name: %v", callbackQueue.Name)
 
 	// TODO: subscribe to this callback queue
@@ -94,7 +108,8 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 			Body:            []byte(imgUrl),
 			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 			Priority:        0,              // 0-9
-			ReplyTo:         callbackQueue.Name,
+			// ReplyTo:         callbackQueue.Name, Not working
+			ReplyTo: c.rabbitConfig.CallbackRoutingKey,
 			// a bunch of application/implementation-specific fields
 		},
 	); err != nil {
@@ -109,7 +124,7 @@ func (c OcrRpcClient) subscribeCallbackQueue(callbackQueue amqp.Queue) error {
 		callbackQueue.Name, // name
 		tag,                // consumerTag,
 		true,               // noAck
-		false,              // exclusive
+		true,               // exclusive
 		false,              // noLocal
 		false,              // noWait
 		nil,                // arguments
@@ -129,7 +144,7 @@ func (c OcrRpcClient) handle(deliveries <-chan amqp.Delivery) {
 	for d := range deliveries {
 		logg.LogTo(
 			"OCR_CLIENT",
-			"got %dB delivery: [%v] %q.  Reply to: %v",
+			"got %dB delivery!!!!!!!: [%v] %q.  Reply to: %v",
 			len(d.Body),
 			d.DeliveryTag,
 			d.Body,
