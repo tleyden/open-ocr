@@ -11,9 +11,12 @@ func init() {
 	logg.LogKeys["TEST"] = true
 	logg.LogKeys["OCR_CLIENT"] = true
 	logg.LogKeys["OCR_WORKER"] = true
+	logg.LogKeys["OCR_TESSERACT"] = true
 }
 
 func TestOcrRpcClientIntegration(t *testing.T) {
+
+	testImageUrl := "http://localhost:8080/img"
 
 	// assumes that rabbit mq is running
 
@@ -41,7 +44,7 @@ func TestOcrRpcClientIntegration(t *testing.T) {
 		logg.LogTo("TEST", "err: %v", err)
 	}
 	assert.True(t, err == nil)
-	decodeResult, err := ocrClient.DecodeImageUrl("http://foo.png", ENGINE_MOCK)
+	decodeResult, err := ocrClient.DecodeImageUrl(testImageUrl, ENGINE_TESSERACT)
 	if err != nil {
 		logg.LogTo("TEST", "err: %v", err)
 	}

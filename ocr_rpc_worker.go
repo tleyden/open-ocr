@@ -129,7 +129,7 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 			d.ReplyTo,
 		)
 
-		engineType := ENGINE_MOCK // TODO: the engine type should be specified in the message
+		engineType := ENGINE_TESSERACT // TODO: the engine type should be specified in the message
 		ocrEngine := NewOcrEngine(engineType)
 		imgUrl := string(d.Body)
 		ocrResult, err := ocrEngine.ProcessImageUrl(imgUrl)
