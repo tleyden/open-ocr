@@ -1,6 +1,7 @@
 package ocrworker
 
 import (
+	"encoding/json"
 	"github.com/couchbaselabs/logg"
 	"github.com/nu7hatch/gouuid"
 	"github.com/streadway/amqp"
@@ -16,6 +17,11 @@ type OcrResult struct {
 	Text string
 }
 
+type OcrRequest struct {
+	ImgUrl     string
+	EngineType OcrEngineType
+}
+
 func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 	ocrRpcClient := &OcrRpcClient{
 		rabbitConfig: rc,
@@ -26,6 +32,16 @@ func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResult, error) {
 
 	var err error
+
+	ocrRequest := OcrRequest{
+		ImgUrl:     imgUrl,
+		EngineType: eng,
+	}
+	ocrRequestJson, err := json.Marshal(ocrRequest)
+	if err != nil {
+		return OcrResult{}, err
+	}
+	logg.LogTo("OCR_CLIENT", "requestJson: %v", string(ocrRequestJson))
 
 	correlationUuidRaw, err := uuid.NewV4()
 	if err != nil {
@@ -80,14 +96,13 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 		false, // immediate
 		amqp.Publishing{
 			Headers:         amqp.Table{},
-			ContentType:     "text/plain",
+			ContentType:     "application/json",
 			ContentEncoding: "",
-			Body:            []byte(imgUrl),
+			Body:            []byte(ocrRequestJson),
 			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 			Priority:        0,              // 0-9
-			// ReplyTo:         callbackQueue.Name, Not working
-			ReplyTo:       c.rabbitConfig.CallbackRoutingKey,
-			CorrelationId: correlationUuid,
+			ReplyTo:         c.rabbitConfig.CallbackRoutingKey,
+			CorrelationId:   correlationUuid,
 			// a bunch of application/implementation-specific fields
 		},
 	); err != nil {

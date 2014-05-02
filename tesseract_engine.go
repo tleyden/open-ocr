@@ -18,9 +18,7 @@ type TesseractEngine struct {
 
 func (t TesseractEngine) ProcessImageUrl(imgUrl string) (OcrResult, error) {
 
-	// TODO: plug in tesseraact
-
-	// create new tess instance and point it to the tessdata location. Set language to english.
+	logg.LogTo("OCR_TESSERACT", "ProcessImageUrl()")
 
 	tess, err := tesseract.NewTess(TESSERACT_MODEL_DIR, TESSERACT_LANG)
 	if err != nil {
@@ -39,8 +37,6 @@ func (t TesseractEngine) ProcessImageUrl(imgUrl string) (OcrResult, error) {
 	if err != nil {
 		return OcrResult{}, err
 	}
-
-	logg.LogTo("OCR_TESSERACT", "saved %v to %v", imgUrl, tmpFileName)
 
 	pix, err := leptonica.NewPixFromFile(tmpFileName)
 	if err != nil {

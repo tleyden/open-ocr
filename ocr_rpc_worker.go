@@ -1,6 +1,7 @@
 package ocrworker
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/streadway/amqp"
@@ -129,13 +130,22 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 			d.ReplyTo,
 		)
 
-		engineType := ENGINE_TESSERACT // TODO: the engine type should be specified in the message
-		ocrEngine := NewOcrEngine(engineType)
-		imgUrl := string(d.Body)
-		ocrResult, err := ocrEngine.ProcessImageUrl(imgUrl)
+		ocrRequest := OcrRequest{}
+		err := json.Unmarshal(d.Body, &ocrRequest)
 		if err != nil {
 			msg := "Error processing image url: %v.  Error: %v"
-			logg.LogError(fmt.Errorf(msg, imgUrl, err))
+			logg.LogError(fmt.Errorf(msg, ocrRequest.ImgUrl, err))
+			done <- err
+			break
+		}
+
+		ocrEngine := NewOcrEngine(ocrRequest.EngineType)
+
+		logg.LogTo("OCR_WORKER", "body: %v", string(d.Body))
+		ocrResult, err := ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
+		if err != nil {
+			msg := "Error processing image url: %v.  Error: %v"
+			logg.LogError(fmt.Errorf(msg, ocrRequest.ImgUrl, err))
 			done <- err
 			break
 		}
