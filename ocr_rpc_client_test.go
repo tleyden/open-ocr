@@ -4,7 +4,6 @@ import (
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
 	"testing"
-	"time"
 )
 
 func init() {
@@ -44,16 +43,12 @@ func TestOcrRpcClientIntegration(t *testing.T) {
 		logg.LogTo("TEST", "err: %v", err)
 	}
 	assert.True(t, err == nil)
-	decodeResult, err := ocrClient.DecodeImageUrl(testImageUrl, ENGINE_TESSERACT)
+	decodeResult, err := ocrClient.DecodeImageUrl(testImageUrl, ENGINE_MOCK)
 	if err != nil {
 		logg.LogTo("TEST", "err: %v", err)
 	}
 	assert.True(t, err == nil)
 	logg.LogTo("TEST", "decodeResult: %v", decodeResult)
-
-	// TODO: add assertions on decodeResult ..
-
-	// workaround since rpc client does not block waiting for response yet
-	time.Sleep(5 * time.Second)
+	assert.Equals(t, decodeResult.Text, MOCK_ENGINE_RESPONSE)
 
 }

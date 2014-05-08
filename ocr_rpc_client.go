@@ -2,9 +2,15 @@ package ocrworker
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/nu7hatch/gouuid"
 	"github.com/streadway/amqp"
+	"time"
+)
+
+const (
+	RPC_RESPONSE_TIMEOUT = time.Second * 30
 )
 
 type OcrRpcClient struct {
@@ -72,7 +78,9 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 		return OcrResult{}, err
 	}
 
-	err = c.subscribeCallbackQueue(correlationUuid)
+	rpcResponseChan := make(chan OcrResult)
+
+	err = c.subscribeCallbackQueue(correlationUuid, rpcResponseChan)
 	if err != nil {
 		return OcrResult{}, err
 	}
@@ -109,10 +117,16 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 		return OcrResult{}, nil
 	}
 
-	return OcrResult{}, nil
+	select {
+	case ocrResult := <-rpcResponseChan:
+		return ocrResult, nil
+	case <-time.After(RPC_RESPONSE_TIMEOUT):
+		return OcrResult{}, fmt.Errorf("Timeout waiting for RPC response")
+	}
+
 }
 
-func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string) error {
+func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string, rpcResponseChan chan OcrResult) error {
 
 	// declare a callback queue where we will receive rpc responses
 	callbackQueue, err := c.channel.QueueDeclare(
@@ -153,13 +167,13 @@ func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string) error {
 		return err
 	}
 
-	go c.handleRpcResponse(deliveries, correlationUuid)
+	go c.handleRpcResponse(deliveries, correlationUuid, rpcResponseChan)
 
 	return nil
 
 }
 
-func (c OcrRpcClient) handleRpcResponse(deliveries <-chan amqp.Delivery, correlationUuid string) {
+func (c OcrRpcClient) handleRpcResponse(deliveries <-chan amqp.Delivery, correlationUuid string, rpcResponseChan chan OcrResult) {
 	logg.LogTo("OCR_CLIENT", "looping over deliveries..")
 	for d := range deliveries {
 		if d.CorrelationId == correlationUuid {
@@ -173,6 +187,15 @@ func (c OcrRpcClient) handleRpcResponse(deliveries <-chan amqp.Delivery, correla
 			)
 
 			defer c.connection.Close()
+
+			ocrResult := OcrResult{
+				Text: string(d.Body),
+			}
+
+			logg.LogTo("OCR_CLIENT", "send result to rpcResponseChan")
+			rpcResponseChan <- ocrResult
+			logg.LogTo("OCR_CLIENT", "sent result to rpcResponseChan")
+
 			return
 
 		} else {
