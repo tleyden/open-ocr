@@ -13,11 +13,7 @@ func init() {
 	logg.LogKeys["OCR_TESSERACT"] = true
 }
 
-func TestOcrRpcClientIntegration(t *testing.T) {
-
-	testImageUrl := "http://localhost:8080/img"
-
-	// assumes that rabbit mq is running
+func rabbitConfigForTests() RabbitConfig {
 
 	rabbitConfig := RabbitConfig{
 		AmqpURI:            "amqp://guest:guest@localhost:5672/",
@@ -29,6 +25,15 @@ func TestOcrRpcClientIntegration(t *testing.T) {
 		QueueName:          "test-queue",
 		CallbackQueueName:  "callback-queue",
 	}
+	return rabbitConfig
+}
+
+// This test assumes that rabbit mq is running
+func TestOcrRpcClientIntegration(t *testing.T) {
+
+	testImageUrl := "http://localhost:8080/img"
+
+	rabbitConfig := rabbitConfigForTests()
 
 	// kick off a worker
 	// this would normally happen on a different machine ..
