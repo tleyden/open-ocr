@@ -10,6 +10,7 @@ func init() {
 	logg.LogKeys["TEST"] = true
 	logg.LogKeys["OCR_CLIENT"] = true
 	logg.LogKeys["OCR_WORKER"] = true
+	logg.LogKeys["OCR_HTTP"] = true
 	logg.LogKeys["OCR_TESSERACT"] = true
 }
 
@@ -31,6 +32,8 @@ func rabbitConfigForTests() RabbitConfig {
 // This test assumes that rabbit mq is running
 func TestOcrRpcClientIntegration(t *testing.T) {
 
+	// TODO: serve this up through a fake webserver
+	// that reads from the filesystem
 	testImageUrl := "http://localhost:8080/img"
 
 	rabbitConfig := rabbitConfigForTests()
