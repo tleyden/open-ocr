@@ -165,7 +165,12 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 }
 
 func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string, correlationId string) error {
+
 	if w.rabbitConfig.Reliable {
+		// Do not use w.rabbitConfig.Reliable=true due to major issues
+		// that will completely  wedge the rpc worker.  Setting the
+		// buffered channels length higher would delay the problem,
+		// but then it would still happen later.
 		if err := w.channel.Confirm(false); err != nil {
 			return err
 		}

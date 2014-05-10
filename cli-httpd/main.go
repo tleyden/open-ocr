@@ -19,16 +19,7 @@ func init() {
 
 func main() {
 
-	rabbitConfig := ocrworker.RabbitConfig{
-		AmqpURI:            "amqp://guest:guest@localhost:5672/",
-		Exchange:           "test-exchange",
-		ExchangeType:       "direct",
-		RoutingKey:         "test-key",
-		CallbackRoutingKey: "callback-key",
-		Reliable:           true,
-		QueueName:          "test-queue",
-		CallbackQueueName:  "callback-queue",
-	}
+	rabbitConfig := ocrworker.DefaultTestConfig()
 
 	// add a handler to serve up an image from the filesystem.
 	http.HandleFunc("/img", func(w http.ResponseWriter, r *http.Request) {

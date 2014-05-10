@@ -15,17 +15,7 @@ func init() {
 }
 
 func rabbitConfigForTests() RabbitConfig {
-
-	rabbitConfig := RabbitConfig{
-		AmqpURI:            "amqp://guest:guest@localhost:5672/",
-		Exchange:           "test-exchange",
-		ExchangeType:       "direct",
-		RoutingKey:         "test-key",
-		CallbackRoutingKey: "callback-key",
-		Reliable:           true,
-		QueueName:          "test-queue",
-		CallbackQueueName:  "callback-queue",
-	}
+	rabbitConfig := DefaultTestConfig()
 	return rabbitConfig
 }
 

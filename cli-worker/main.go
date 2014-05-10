@@ -17,16 +17,7 @@ func init() {
 
 func main() {
 
-	rabbitConfig := ocrworker.RabbitConfig{
-		AmqpURI:            "amqp://guest:guest@localhost:5672/",
-		Exchange:           "test-exchange",
-		ExchangeType:       "direct",
-		RoutingKey:         "test-key",
-		CallbackRoutingKey: "callback-key",
-		Reliable:           true,
-		QueueName:          "test-queue",
-		CallbackQueueName:  "callback-queue",
-	}
+	rabbitConfig := ocrworker.DefaultTestConfig()
 
 	ocrWorker, err := ocrworker.NewOcrRpcWorker(rabbitConfig)
 	if err != nil {
