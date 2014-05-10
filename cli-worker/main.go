@@ -36,7 +36,4 @@ func main() {
 
 	select {}
 
-	// blockForeverChan := make(chan bool)
-	// <-blockForeverChan
-
 }
