@@ -26,17 +26,20 @@ func (s *OcrHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	err := decoder.Decode(&ocrReq)
 	if err != nil {
+		logg.LogError(err)
 		http.Error(w, "Unable to unmarshal json", 500)
 		return
 	}
 
 	ocrClient, err := NewOcrRpcClient(s.RabbitConfig)
 	if err != nil {
+		logg.LogError(err)
 		http.Error(w, "Unable to create rpc client", 500)
 		return
 	}
 	decodeResult, err := ocrClient.DecodeImageUrl(ocrReq.ImgUrl, ocrReq.EngineType)
 	if err != nil {
+		logg.LogError(err)
 		http.Error(w, "Unable to perform OCR decode", 500)
 		return
 	}
