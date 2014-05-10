@@ -23,11 +23,6 @@ type OcrResult struct {
 	Text string
 }
 
-type OcrRequest struct {
-	ImgUrl     string
-	EngineType OcrEngineType
-}
-
 func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 	ocrRpcClient := &OcrRpcClient{
 		rabbitConfig: rc,
