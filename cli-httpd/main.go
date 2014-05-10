@@ -1,0 +1,42 @@
+package main
+
+import (
+	"github.com/couchbaselabs/logg"
+	"github.com/tleyden/ocr-worker"
+	"net/http"
+)
+
+// This assumes that there is a worker running
+// To test it:
+// curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://localhost:8081/img","engine":0}' http://localhost:8081/ocr
+
+func init() {
+	logg.LogKeys["OCR_CLIENT"] = true
+	logg.LogKeys["OCR_WORKER"] = true
+	logg.LogKeys["OCR_HTTP"] = true
+	logg.LogKeys["OCR_TESSERACT"] = true
+}
+
+func main() {
+
+	rabbitConfig := ocrworker.RabbitConfig{
+		AmqpURI:            "amqp://guest:guest@localhost:5672/",
+		Exchange:           "test-exchange",
+		ExchangeType:       "direct",
+		RoutingKey:         "test-key",
+		CallbackRoutingKey: "callback-key",
+		Reliable:           true,
+		QueueName:          "test-queue",
+		CallbackQueueName:  "callback-queue",
+	}
+
+	// add a handler to serve up an image from the filesystem.
+	http.HandleFunc("/img", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../refactoring.png")
+	})
+
+	http.Handle("/ocr", ocrworker.NewOcrHttpHandler(rabbitConfig))
+
+	logg.LogError(http.ListenAndServe(":8081", nil))
+
+}
