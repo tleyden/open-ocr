@@ -51,12 +51,17 @@ func TestOcrRpcClientIntegration(t *testing.T) {
 		logg.LogTo("TEST", "err: %v", err)
 	}
 	assert.True(t, err == nil)
-	decodeResult, err := ocrClient.DecodeImageUrl(testImageUrl, ENGINE_MOCK)
-	if err != nil {
-		logg.LogTo("TEST", "err: %v", err)
+
+	for i := 0; i < 50; i++ {
+
+		decodeResult, err := ocrClient.DecodeImageUrl(testImageUrl, ENGINE_MOCK)
+		if err != nil {
+			logg.LogTo("TEST", "err: %v", err)
+		}
+		assert.True(t, err == nil)
+		logg.LogTo("TEST", "decodeResult: %v", decodeResult)
+		assert.Equals(t, decodeResult.Text, MOCK_ENGINE_RESPONSE)
+
 	}
-	assert.True(t, err == nil)
-	logg.LogTo("TEST", "decodeResult: %v", decodeResult)
-	assert.Equals(t, decodeResult.Text, MOCK_ENGINE_RESPONSE)
 
 }
