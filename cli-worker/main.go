@@ -17,7 +17,7 @@ func init() {
 
 func main() {
 
-	rabbitConfig := ocrworker.DefaultTestConfig()
+	rabbitConfig := ocrworker.DefaultConfigFlagsOverride()
 
 	ocrWorker, err := ocrworker.NewOcrRpcWorker(rabbitConfig)
 	if err != nil {

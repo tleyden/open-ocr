@@ -19,7 +19,7 @@ func init() {
 
 func main() {
 
-	rabbitConfig := ocrworker.DefaultTestConfig()
+	rabbitConfig := ocrworker.DefaultConfigFlagsOverride()
 
 	// add a handler to serve up an image from the filesystem.
 	http.HandleFunc("/img", func(w http.ResponseWriter, r *http.Request) {

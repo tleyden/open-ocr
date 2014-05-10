@@ -1,5 +1,9 @@
 package ocrworker
 
+import (
+	"flag"
+)
+
 type RabbitConfig struct {
 	AmqpURI            string
 	Exchange           string
@@ -27,6 +31,26 @@ func DefaultTestConfig() RabbitConfig {
 		QueueName:          "test-queue",
 		CallbackQueueName:  "callback-queue",
 	}
+	return rabbitConfig
+
+}
+
+func DefaultConfigFlagsOverride() RabbitConfig {
+	rabbitConfig := DefaultTestConfig()
+
+	var AmqpURI string
+	flag.StringVar(
+		&AmqpURI,
+		"amqp_uri",
+		"",
+		"The Amqp URI, eg: amqp://guest:guest@localhost:5672/",
+	)
+
+	flag.Parse()
+	if len(AmqpURI) > 0 {
+		rabbitConfig.AmqpURI = AmqpURI
+	}
+
 	return rabbitConfig
 
 }
