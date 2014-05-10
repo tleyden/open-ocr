@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/streadway/amqp"
+	"time"
 )
 
 type OcrRpcWorker struct {
@@ -169,7 +170,7 @@ func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string, correlationI
 			return err
 		}
 
-		ack, nack := w.channel.NotifyConfirm(make(chan uint64, 1), make(chan uint64, 1))
+		ack, nack := w.channel.NotifyConfirm(make(chan uint64, 100), make(chan uint64, 100))
 
 		defer confirmDeliveryWorker(ack, nack)
 	}
@@ -199,10 +200,15 @@ func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string, correlationI
 }
 
 func confirmDeliveryWorker(ack, nack chan uint64) {
+	logg.LogTo("OCR_WORKER", "awaiting delivery confirmation ...")
 	select {
 	case tag := <-ack:
 		logg.LogTo("OCR_WORKER", "confirmed delivery, tag: %v", tag)
 	case tag := <-nack:
 		logg.LogTo("OCR_WORKER", "failed to confirm delivery: %v", tag)
+	case <-time.After(RPC_RESPONSE_TIMEOUT):
+		// this is bad, the worker will probably be dsyfunctional
+		// at this point, so panic
+		logg.LogPanic("timeout trying to confirm delivery")
 	}
 }
