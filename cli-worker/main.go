@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/couchbaselabs/logg"
-	"github.com/tleyden/ocr-worker"
+	"github.com/tleyden/open-ocr"
 )
 
 // This assumes that there is a rabbit mq running
