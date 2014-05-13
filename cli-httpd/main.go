@@ -28,6 +28,7 @@ func main() {
 
 	http.Handle("/ocr", ocrworker.NewOcrHttpHandler(rabbitConfig))
 
+	logg.LogTo("OCR_HTTP", "Starting listener on port 8081")
 	logg.LogError(http.ListenAndServe(":8081", nil))
 
 }
