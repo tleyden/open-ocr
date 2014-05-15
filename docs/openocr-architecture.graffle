@@ -94,7 +94,7 @@
 			<array>
 				<string>{421.00003, 508.49997}</string>
 				<string>{421, 437.5}</string>
-				<string>{332.78427, 389.91638}</string>
+				<string>{325.89288, 389.90283}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -114,7 +114,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{399.50003, 470.82077}, {43, 24}}</string>
+			<string>{{399.50003, 469.90271}, {43, 24}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -302,8 +302,8 @@
 			<integer>17</integer>
 			<key>Points</key>
 			<array>
-				<string>{215.46312, 194.46146}</string>
-				<string>{285.25696, 206.32387}</string>
+				<string>{215.46315, 194.43483}</string>
+				<string>{285.25702, 206.26843}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -333,8 +333,8 @@
 			<integer>22</integer>
 			<key>Points</key>
 			<array>
-				<string>{275.70038, 346.2822}</string>
-				<string>{215.27423, 267.45227}</string>
+				<string>{266.89343, 346.2717}</string>
+				<string>{213.25572, 270.9072}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -438,7 +438,7 @@
 			<array>
 				<string>{172.00607, 508.49997}</string>
 				<string>{172, 438.5}</string>
-				<string>{255.21603, 389.93106}</string>
+				<string>{248.28345, 389.94751}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -458,7 +458,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{86.970215, 346.67902}, {411.02979, 43}}</string>
+			<string>{{86.970215, 346.67902}, {391.02979, 43}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>ID</key>
@@ -648,7 +648,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{69, 329}, {441, 90}}</string>
+			<string>{{69, 329}, {424.25, 90}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>ID</key>
@@ -687,7 +687,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{150.50366, 468.66745}, {43, 24}}</string>
+			<string>{{150.50374, 469.65936}, {43, 24}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -782,7 +782,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{45, 54}, {476, 400}}</string>
+			<string>{{45, 54}, {471, 400}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
@@ -872,7 +872,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2014-05-13 15:54:25 +0000</string>
+	<string>2014-05-15 15:11:40 +0000</string>
 	<key>Modifier</key>
 	<string>Traun Leyden</string>
 	<key>NotesVisible</key>

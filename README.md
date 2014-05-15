@@ -3,7 +3,9 @@ OpenOCR makes it host your own OCR ReST API.
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
-Currently [Tesseract](https://code.google.com/p/tesseract-ocr/) is the only supported OCR engine.
+# Supported OCR engines
+
+* [Tesseract](https://code.google.com/p/tesseract-ocr/)
 
 # REST API call example
 
@@ -28,7 +30,7 @@ below I have used a few variations that work for variable names.
 
 ```
 
-# Launch OpenOCR on Orchard
+# Launching OpenOCR on Orchard
 
 There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms.
 
@@ -45,21 +47,30 @@ for instructions on signing up and installing their CLI management tool.
 orchard docker run -d -p 5672:5672 -p 15672:15672 tutum/rabbitmq
 ```
 
+You will need to use `orchard hosts` and `orchard docker logs <container_id>` to get the amqp uri to use in later steps, eg `amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/`
+
 ### OpenOCR Worker
 
 ```
-orchard docker run  open-ocr-worker open-ocr-worker -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/"
+orchard docker run -d tleyden5iwx/open-ocr open-ocr-worker -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/"
 ```
 
 ### OpenOCR HTTP API Server
 
 ```
-orchard docker run -p 8081:8081 open-ocr-worker open-ocr-httpd -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/"
+orchard docker run -d -p 8081:8081 tleyden5iwx/open-ocr open-ocr-httpd -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/"
 ```
 
-# How to build docker images:
+# Building Docker images
+
+You can safely ignore these notes if you are just *using* the docker images.  But they may be useful if you need to rebuild your own images for any reason.
+
+## Orchard "test" images
 
 * git clone github.com/tleyden/docker
-* cd docker/ocr-worker
-* orchard docker build -t open-ocr-worker .
+* cd docker/open-ocr
+* orchard docker build -t open-ocr .
  
+## Official docker.io images
+
+* trusted build pointed to github.com/tleyden/docker/open-ocr
