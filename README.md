@@ -3,7 +3,7 @@ OpenOCR makes it host your own OCR ReST API.
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
-Currently Google Tesseract is the only supported OCR engine.
+Currently [Tesseract](https://code.google.com/p/tesseract-ocr/) is the only supported OCR engine.
 
 # REST API call example
 
