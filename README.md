@@ -1,11 +1,7 @@
 
-OpenOCR makes it simple to host your own OCR ReST API, powered by Tesseract OCR.  
+OpenOCR makes it simple to host your own OCR ReST API, powered by [Tesseract OCR](https://code.google.com/p/tesseract-ocr/)
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
-
-# Supported OCR engines
-
-* [Tesseract](https://code.google.com/p/tesseract-ocr/)
 
 # Launching OpenOCR on Orchard
 
@@ -27,11 +23,13 @@ and you should see a result like:
 ```
 NAME                SIZE                IP
 default             512M                107.170.72.189
-``
+```
+
+The ip address `107.170.72.189` will be used as the `ORCHARD_HOST` env variable below.
 
 ## Launch docker images
 
-Using a the ip from the above step as the ORCHARD_HOST, and a super secret password, launch the docker images via:
+Here's how to launch the docker images needed for OpenOCR.
 
 ```
 $ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
@@ -40,7 +38,7 @@ $ chmod +x launcher.sh
 $ ./launcher.sh
 ```
 
-*Note: you don't even need to clone this repo!*
+*Note: as you may have noticed, you don't even need to clone this git repo!*
 
 This will start three docker instances:
 
@@ -72,17 +70,3 @@ composed of alphanumeric characters and the underscore. In the example
 below I have used a few variations that work for variable names.
 
 ```
-
-# Building Docker images
-
-You can safely ignore these notes if you are just *using* the docker images.  But they may be useful if you need to rebuild your own images for any reason.
-
-## Orchard "test" images
-
-* git clone github.com/tleyden/docker
-* cd docker/open-ocr
-* orchard docker build -t open-ocr .
- 
-## Official docker.io images
-
-* trusted build pointed to github.com/tleyden/docker/open-ocr
