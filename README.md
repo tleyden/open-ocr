@@ -59,7 +59,7 @@ orchard docker run -d tleyden5iwx/open-ocr open-ocr-worker -amqp_uri "amqp://adm
 ### OpenOCR HTTP API Server
 
 ```
-orchard docker run -d -p 8081:8081 tleyden5iwx/open-ocr open-ocr-httpd -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/"
+orchard docker run -d -p 8081:8081 tleyden5iwx/open-ocr open-ocr-httpd -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/" -http_port 8080
 ```
 
 # Building Docker images
