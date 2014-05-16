@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Open-ocr by tleyden</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Open-ocr</h1>
+        <h2>Open source OCR-as-a-Service using Google Tesseract</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/tleyden/open-ocr/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/tleyden/open-ocr/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/tleyden/open-ocr" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>OpenOCR makes it simple to host your own OCR ReST API, powered by <a href="https://code.google.com/p/tesseract-ocr/">Tesseract OCR</a></p>
+
+<p><img src="http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png" alt="screenshot"></p>
+
+<h1>
+<a name="launching-openocr-on-orchard" class="anchor" href="#launching-openocr-on-orchard"><span class="octicon octicon-link"></span></a>Launching OpenOCR on Orchard</h1>
+
+<p>There are several <a href="http://www.docker.io">docker</a> PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards <a href="http://www.orchardup.com">Orchard</a>, but should be easily adaptable to other platforms.</p>
+
+<h2>
+<a name="install-orchard-cli-tool" class="anchor" href="#install-orchard-cli-tool"><span class="octicon octicon-link"></span></a>Install Orchard CLI tool</h2>
+
+<p>See the <a href="https://www.orchardup.com/docs">Orchard Getting Started Guide</a>
+for instructions on signing up and installing their CLI management tool.</p>
+
+<h2>
+<a name="find-out-your-orchard-host" class="anchor" href="#find-out-your-orchard-host"><span class="octicon octicon-link"></span></a>Find out your orchard host</h2>
+
+<pre><code>$ orchard hosts
+</code></pre>
+
+<p>and you should see a result like:</p>
+
+<pre><code>NAME                SIZE                IP
+default             512M                107.170.72.189
+</code></pre>
+
+<p>The ip address <code>107.170.72.189</code> will be used as the <code>ORCHARD_HOST</code> env variable below.</p>
+
+<h2>
+<a name="launch-docker-images" class="anchor" href="#launch-docker-images"><span class="octicon octicon-link"></span></a>Launch docker images</h2>
+
+<p>Here's how to launch the docker images needed for OpenOCR.</p>
+
+<pre><code>$ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
+$ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ chmod +x launcher.sh
+$ ./launcher.sh
+</code></pre>
+
+<p><em>Note: as you may have noticed, you don't even need to clone this git repo!</em></p>
+
+<p>This will start three docker instances:</p>
+
+<ul>
+<li>RabbitMQ</li>
+<li>OpenOCR Worker</li>
+<li>OpenOCR HTTP API Server</li>
+</ul><p>You are now ready to decode images -&gt; text via your REST API.</p>
+
+<h1>
+<a name="test-the-rest-api" class="anchor" href="#test-the-rest-api"><span class="octicon octicon-link"></span></a>Test the REST API</h1>
+
+<p><strong>Request</strong></p>
+
+<pre><code>$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://tleyden-misc.s3.amazonaws.com/blog_images/ocr_test.png","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
+</code></pre>
+
+<p><strong>Response</strong></p>
+
+<pre><code>&lt; HTTP/1.1 200 OK
+&lt; Date: Tue, 13 May 2014 16:18:50 GMT
+&lt; Content-Length: 283
+&lt; Content-Type: text/plain; charset=utf-8
+&lt;
+You can create local variables for the pipelines within the template by
+preﬁxing the variable name with a “$" sign. Variable names have to be
+composed of alphanumeric characters and the underscore. In the example
+below I have used a few variations that work for variable names.
+
+</code></pre>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
