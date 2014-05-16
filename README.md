@@ -70,3 +70,6 @@ below I have used a few variations that work for variable names.
 
 ```
 
+# License
+
+OpenOCR is Open Source and available under the Apache 2 License.
