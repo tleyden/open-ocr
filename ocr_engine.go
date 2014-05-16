@@ -32,7 +32,6 @@ func (e *OcrEngineType) UnmarshalJSON(b []byte) (err error) {
 	var engineTypeStr string
 
 	if err := json.Unmarshal(b, &engineTypeStr); err == nil {
-		logg.LogTo("OCR", "its a string")
 		engineString := strings.ToUpper(engineTypeStr)
 		switch engineString {
 		case "TESSERACT":

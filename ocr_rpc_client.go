@@ -174,7 +174,7 @@ func (c OcrRpcClient) handleRpcResponse(deliveries <-chan amqp.Delivery, correla
 		if d.CorrelationId == correlationUuid {
 			logg.LogTo(
 				"OCR_CLIENT",
-				"got %dB delivery!!!!!!!: [%v] %q.  Reply to: %v",
+				"got %dB delivery: [%v] %q.  Reply to: %v",
 				len(d.Body),
 				d.DeliveryTag,
 				d.Body,

@@ -120,6 +120,35 @@ func (w *OcrRpcWorker) Shutdown() error {
 	return <-w.done
 }
 
+func (w *OcrRpcWorker) resultForDelivery(d amqp.Delivery) (OcrResult, error) {
+
+	ocrRequest := OcrRequest{}
+	ocrResult := OcrResult{Text: "Error"}
+	err := json.Unmarshal(d.Body, &ocrRequest)
+	if err != nil {
+		msg := "Error unmarshaling json: %v.  Error: %v"
+		errMsg := fmt.Sprintf(msg, string(d.Body), err)
+		logg.LogError(fmt.Errorf(errMsg))
+		ocrResult.Text = errMsg
+		return ocrResult, err
+	}
+
+	ocrEngine := NewOcrEngine(ocrRequest.EngineType)
+
+	logg.LogTo("OCR_WORKER", "body: %v", string(d.Body))
+	ocrResult, err = ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
+	if err != nil {
+		msg := "Error processing image url: %v.  Error: %v"
+		errMsg := fmt.Sprintf(msg, ocrRequest.ImgUrl, err)
+		logg.LogError(fmt.Errorf(errMsg))
+		ocrResult.Text = errMsg
+		return ocrResult, err
+	}
+
+	return ocrResult, nil
+
+}
+
 func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) {
 	for d := range deliveries {
 		logg.LogTo(
@@ -131,30 +160,18 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 			d.ReplyTo,
 		)
 
-		ocrRequest := OcrRequest{}
-		err := json.Unmarshal(d.Body, &ocrRequest)
+		ocrResult, err := w.resultForDelivery(d)
 		if err != nil {
-			msg := "Error processing image url: %v.  Error: %v"
-			logg.LogError(fmt.Errorf(msg, ocrRequest.ImgUrl, err))
-			done <- err
-			break
+			msg := "Error generating ocr result.  Error: %v"
+			logg.LogError(fmt.Errorf(msg, err))
 		}
 
-		ocrEngine := NewOcrEngine(ocrRequest.EngineType)
-
-		logg.LogTo("OCR_WORKER", "body: %v", string(d.Body))
-		ocrResult, err := ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
-		if err != nil {
-			msg := "Error processing image url: %v.  Error: %v"
-			logg.LogError(fmt.Errorf(msg, ocrRequest.ImgUrl, err))
-			done <- err
-			break
-		}
-
+		logg.LogTo("OCR_WORKER", "Sending rpc response: %v", ocrResult)
 		err = w.sendRpcResponse(ocrResult, d.ReplyTo, d.CorrelationId)
 		if err != nil {
 			msg := "Error returning ocr result: %v.  Error: %v"
 			logg.LogError(fmt.Errorf(msg, ocrResult, err))
+			// if we can't send our response, let's just abort
 			done <- err
 			break
 		}
