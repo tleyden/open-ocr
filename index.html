@@ -83,11 +83,12 @@ $ ./launcher.sh
 
 <p><strong>Request</strong></p>
 
-<pre><code>$ TEST_IMAGE=http://tleyden-misc.s3.amazonaws.com/blog_images/ocr_test.png
-$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"$TEST_IMAGE","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
+<pre><code>$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"bit.ly/ocrimage","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
 </code></pre>
 
 <p><strong>Response</strong></p>
+
+<p>It will return the decoded text for the <a href="bit.ly/ocrimage">test image</a>:</p>
 
 <pre><code>&lt; HTTP/1.1 200 OK
 &lt; Date: Tue, 13 May 2014 16:18:50 GMT
