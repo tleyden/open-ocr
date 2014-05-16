@@ -55,7 +55,7 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"bit.ly/ocrima
 
 **Response**
 
-It will return the decoded text for the [test image](bit.ly/ocrimage):
+It will return the decoded text for the [test image](http://bit.ly/ocrimage):
 
 ```
 < HTTP/1.1 200 OK
