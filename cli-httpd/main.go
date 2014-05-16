@@ -13,6 +13,7 @@ import (
 // curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://localhost:8081/img","engine":0}' http://localhost:8081/ocr
 
 func init() {
+	logg.LogKeys["OCR"] = true
 	logg.LogKeys["OCR_CLIENT"] = true
 	logg.LogKeys["OCR_WORKER"] = true
 	logg.LogKeys["OCR_HTTP"] = true

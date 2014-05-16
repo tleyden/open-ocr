@@ -9,6 +9,7 @@ import (
 // To test it, fire up a webserver and send it a curl request
 
 func init() {
+	logg.LogKeys["OCR"] = true
 	logg.LogKeys["OCR_CLIENT"] = true
 	logg.LogKeys["OCR_WORKER"] = true
 	logg.LogKeys["OCR_HTTP"] = true

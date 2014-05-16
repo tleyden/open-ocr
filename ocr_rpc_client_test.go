@@ -8,6 +8,7 @@ import (
 
 func init() {
 	logg.LogKeys["TEST"] = true
+	logg.LogKeys["OCR"] = true
 	logg.LogKeys["OCR_CLIENT"] = true
 	logg.LogKeys["OCR_WORKER"] = true
 	logg.LogKeys["OCR_HTTP"] = true
