@@ -1,5 +1,5 @@
 
-OpenOCR makes it simple to host your own OCR ReST API, powered by [Tesseract OCR](https://code.google.com/p/tesseract-ocr/)
+OpenOCR makes it simple to host your own OCR REST API powered by [Tesseract OCR](https://code.google.com/p/tesseract-ocr/)
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
