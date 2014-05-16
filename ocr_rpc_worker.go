@@ -13,7 +13,7 @@ type OcrRpcWorker struct {
 	conn         *amqp.Connection
 	channel      *amqp.Channel
 	tag          string
-	done         chan error
+	Done         chan error
 }
 
 const tag = "foo" // TODO: should be unique for each worker instance (eg, uuid)
@@ -24,7 +24,7 @@ func NewOcrRpcWorker(rc RabbitConfig) (*OcrRpcWorker, error) {
 		conn:         nil,
 		channel:      nil,
 		tag:          tag,
-		done:         make(chan error),
+		Done:         make(chan error),
 	}
 	return ocrRpcWorker, nil
 }
@@ -99,7 +99,7 @@ func (w OcrRpcWorker) Run() error {
 		return err
 	}
 
-	go w.handle(deliveries, w.done)
+	go w.handle(deliveries, w.Done)
 
 	return nil
 }
@@ -117,36 +117,7 @@ func (w *OcrRpcWorker) Shutdown() error {
 	defer logg.LogTo("OCR_WORKER", "Shutdown OK")
 
 	// wait for handle() to exit
-	return <-w.done
-}
-
-func (w *OcrRpcWorker) resultForDelivery(d amqp.Delivery) (OcrResult, error) {
-
-	ocrRequest := OcrRequest{}
-	ocrResult := OcrResult{Text: "Error"}
-	err := json.Unmarshal(d.Body, &ocrRequest)
-	if err != nil {
-		msg := "Error unmarshaling json: %v.  Error: %v"
-		errMsg := fmt.Sprintf(msg, string(d.Body), err)
-		logg.LogError(fmt.Errorf(errMsg))
-		ocrResult.Text = errMsg
-		return ocrResult, err
-	}
-
-	ocrEngine := NewOcrEngine(ocrRequest.EngineType)
-
-	logg.LogTo("OCR_WORKER", "body: %v", string(d.Body))
-	ocrResult, err = ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
-	if err != nil {
-		msg := "Error processing image url: %v.  Error: %v"
-		errMsg := fmt.Sprintf(msg, ocrRequest.ImgUrl, err)
-		logg.LogError(fmt.Errorf(errMsg))
-		ocrResult.Text = errMsg
-		return ocrResult, err
-	}
-
-	return ocrResult, nil
-
+	return <-w.Done
 }
 
 func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) {
@@ -179,6 +150,35 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 	}
 	logg.LogTo("OCR_WORKER", "handle: deliveries channel closed")
 	done <- nil
+}
+
+func (w *OcrRpcWorker) resultForDelivery(d amqp.Delivery) (OcrResult, error) {
+
+	ocrRequest := OcrRequest{}
+	ocrResult := OcrResult{Text: "Error"}
+	err := json.Unmarshal(d.Body, &ocrRequest)
+	if err != nil {
+		msg := "Error unmarshaling json: %v.  Error: %v"
+		errMsg := fmt.Sprintf(msg, string(d.Body), err)
+		logg.LogError(fmt.Errorf(errMsg))
+		ocrResult.Text = errMsg
+		return ocrResult, err
+	}
+
+	ocrEngine := NewOcrEngine(ocrRequest.EngineType)
+
+	logg.LogTo("OCR_WORKER", "body: %v", string(d.Body))
+	ocrResult, err = ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
+	if err != nil {
+		msg := "Error processing image url: %v.  Error: %v"
+		errMsg := fmt.Sprintf(msg, ocrRequest.ImgUrl, err)
+		logg.LogError(fmt.Errorf(errMsg))
+		ocrResult.Text = errMsg
+		return ocrResult, err
+	}
+
+	return ocrResult, nil
+
 }
 
 func (w *OcrRpcWorker) sendRpcResponse(r OcrResult, replyTo string, correlationId string) error {

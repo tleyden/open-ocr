@@ -27,6 +27,7 @@ func main() {
 	}
 	ocrWorker.Run()
 
-	select {}
+	err = <-ocrWorker.Done
+	logg.LogPanic("Worker failed with error: %v", err)
 
 }
