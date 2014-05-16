@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 
 # Launches all components of the OpenOCR service on the Orchard Docker PAAS
+# 
+# To run this script:
+# $ export ORCHARD_HOST=107.170.72.189
+# $ export RABBITMQ_PASS=the_ns_effin_A!b!@tcH
 
-# TODO: these should all be env variables defined outside of the script
-# TODO: add checking to make sure they are all defined
-
+# TODO
 # export HTTP_PORT=8080  
-export ORCHARD_HOST=107.170.72.189
-export RABBITMQ_PASS=foo
 
 if [ ! -n "$ORCHARD_HOST" ] ; then
   echo "You must define ORCHARD_HOST"
   exit
 fi
-
 
 if [ ! -n "$RABBITMQ_PASS" ] ; then
   echo "You must define RABBITMQ_PASS"

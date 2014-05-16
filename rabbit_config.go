@@ -35,8 +35,16 @@ func DefaultTestConfig() RabbitConfig {
 
 }
 
-func DefaultConfigFlagsOverride() RabbitConfig {
+type FlagFunction func()
+
+func NoOpFlagFunction() FlagFunction {
+	return func() {}
+}
+
+func DefaultConfigFlagsOverride(flagFunction FlagFunction) RabbitConfig {
 	rabbitConfig := DefaultTestConfig()
+
+	flagFunction()
 
 	var AmqpURI string
 	flag.StringVar(

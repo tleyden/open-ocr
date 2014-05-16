@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/open-ocr"
 	"net/http"
@@ -19,7 +21,17 @@ func init() {
 
 func main() {
 
-	rabbitConfig := ocrworker.DefaultConfigFlagsOverride()
+	var http_port int
+	flagFunc := func() {
+		flag.IntVar(
+			&http_port,
+			"http_port",
+			8080,
+			"The http port to listen on, eg, 8081",
+		)
+
+	}
+	rabbitConfig := ocrworker.DefaultConfigFlagsOverride(flagFunc)
 
 	// add a handler to serve up an image from the filesystem.
 	http.HandleFunc("/img", func(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +40,9 @@ func main() {
 
 	http.Handle("/ocr", ocrworker.NewOcrHttpHandler(rabbitConfig))
 
-	logg.LogTo("OCR_HTTP", "Starting listener on port 8081")
-	logg.LogError(http.ListenAndServe(":8081", nil))
+	listenAddr := fmt.Sprintf(":%d", http_port)
+
+	logg.LogTo("OCR_HTTP", "Starting listener on %v", listenAddr)
+	logg.LogError(http.ListenAndServe(listenAddr, nil))
 
 }
