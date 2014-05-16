@@ -1,5 +1,5 @@
 
-OpenOCR makes it host your own OCR ReST API.  
+OpenOCR makes it simple to host your own OCR ReST API, powered by Tesseract OCR.  
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
@@ -12,8 +12,7 @@ OpenOCR makes it host your own OCR ReST API.
 **Request**
 
 ```
-curl -X POST -H "Content-Type: application/json" -d 
-'{"img_url":"http://cl.ly/image/132b2C0T1S3q/Screen%20Shot%202014-05-10%20at%2012.32.18%20PM.png","engine":0}' http://107.170.72.189:8081/ocr
+curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://cl.ly/image/132b2C0T1S3q/Screen%20Shot%202014-05-10%20at%2012.32.18%20PM.png","engine":0}' http://107.170.72.189:8081/ocr
 ```
 
 **Response**
@@ -42,25 +41,22 @@ for instructions on signing up and installing their CLI management tool.
 
 ## Launch docker images
 
-### RabbitMQ
+The service consists of three docker images:
+
+* RabbitMQ
+* OpenOCR Worker
+* OpenOCR HTTP API Server
+
+### 
 
 ```
-orchard docker run -d -p 5672:5672 -p 15672:15672 tutum/rabbitmq
-```
-
-You will need to use `orchard hosts` and `orchard docker logs <container_id>` to get the amqp uri to use in later steps, eg `amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/`
-
-### OpenOCR Worker
+$ git clone https://github.com/tleyden/open-ocr.git
+$ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=foo HTTP_PORT=8080
+$ cd launcher
+$ 
 
 ```
-orchard docker run -d tleyden5iwx/open-ocr open-ocr-worker -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/"
-```
 
-### OpenOCR HTTP API Server
-
-```
-orchard docker run -d -p 8081:8081 tleyden5iwx/open-ocr open-ocr-httpd -amqp_uri "amqp://admin:8Sd7safsdafaukg@107.170.72.189:5672/" -http_port 8080
-```
 
 # Building Docker images
 
