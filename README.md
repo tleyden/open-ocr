@@ -39,9 +39,9 @@ $ ./launcher.sh
 
 This will start three docker instances:
 
-* RabbitMQ
-* OpenOCR Worker
-* OpenOCR HTTP API Server
+* [RabbitMQ](https://index.docker.io/u/tutum/rabbitmq/)
+* [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
+* [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 
 You are now ready to decode images -> text via your REST API.
 
