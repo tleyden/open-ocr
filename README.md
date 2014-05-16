@@ -7,7 +7,50 @@ OpenOCR makes it simple to host your own OCR ReST API, powered by Tesseract OCR.
 
 * [Tesseract](https://code.google.com/p/tesseract-ocr/)
 
-# REST API call example
+# Launching OpenOCR on Orchard
+
+There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms.
+
+## Install Orchard CLI tool
+
+See the [Orchard Getting Started Guide](https://www.orchardup.com/docs)
+for instructions on signing up and installing their CLI management tool.
+
+## Find out your orchard host
+
+```
+$ orchard hosts
+```
+
+and you should see a result like:
+
+```
+NAME                SIZE                IP
+default             512M                107.170.72.189
+``
+
+## Launch docker images
+
+Using a the ip from the above step as the ORCHARD_HOST, and a super secret password, launch the docker images via:
+
+```
+$ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
+$ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ chmod +x launcher.sh
+$ ./launcher.sh
+```
+
+*Note: you don't even need to clone this repo!*
+
+This will start three docker instances:
+
+* RabbitMQ
+* OpenOCR Worker
+* OpenOCR HTTP API Server
+
+You are now ready to decode images -> text via your REST API.
+
+# Test the REST API 
 
 **Request**
 
@@ -29,34 +72,6 @@ composed of alphanumeric characters and the underscore. In the example
 below I have used a few variations that work for variable names.
 
 ```
-
-# Launching OpenOCR on Orchard
-
-There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms.
-
-## Install Orchard CLI tool
-
-See the [Orchard Getting Started Guide](https://www.orchardup.com/docs)
-for instructions on signing up and installing their CLI management tool.
-
-## Launch docker images
-
-The service consists of three docker images:
-
-* RabbitMQ
-* OpenOCR Worker
-* OpenOCR HTTP API Server
-
-### 
-
-```
-$ git clone https://github.com/tleyden/open-ocr.git
-$ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=foo HTTP_PORT=8080
-$ cd launcher
-$ 
-
-```
-
 
 # Building Docker images
 
