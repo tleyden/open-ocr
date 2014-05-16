@@ -53,7 +53,8 @@ You are now ready to decode images -> text via your REST API.
 **Request**
 
 ```
-$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://tleyden-misc.s3.amazonaws.com/blog_images/ocr_test.png","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
+$ TEST_IMAGE=http://tleyden-misc.s3.amazonaws.com/blog_images/ocr_test.png
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"$TEST_IMAGE","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
 ```
 
 **Response**
