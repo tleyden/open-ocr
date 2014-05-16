@@ -1,5 +1,9 @@
 
-OpenOCR makes it simple to host your own OCR REST API powered by [Tesseract OCR](https://code.google.com/p/tesseract-ocr/)
+OpenOCR makes it simple to host your own OCR REST API.
+
+The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com/p/tesseract-ocr/).
+
+[Docker](http://www.docker.io) is used to containerize the various components of the service.
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
@@ -16,11 +20,6 @@ for instructions on signing up and installing their CLI management tool.
 
 ```
 $ orchard hosts
-```
-
-and you should see a result like:
-
-```
 NAME                SIZE                IP
 default             512M                107.170.72.189
 ```
@@ -37,8 +36,6 @@ $ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 ```
-
-*Note: as you may have noticed, you don't even need to clone this git repo!*
 
 This will start three docker instances:
 
