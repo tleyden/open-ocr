@@ -28,7 +28,7 @@
 
     <div class="container">
       <section id="main_content">
-        <p>OpenOCR makes it simple to host your own OCR ReST API, powered by <a href="https://code.google.com/p/tesseract-ocr/">Tesseract OCR</a></p>
+        <p>OpenOCR makes it simple to host your own OCR REST API powered by <a href="https://code.google.com/p/tesseract-ocr/">Tesseract OCR</a></p>
 
 <p><img src="http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png" alt="screenshot"></p>
 
@@ -83,7 +83,8 @@ $ ./launcher.sh
 
 <p><strong>Request</strong></p>
 
-<pre><code>$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://tleyden-misc.s3.amazonaws.com/blog_images/ocr_test.png","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
+<pre><code>$ TEST_IMAGE=http://tleyden-misc.s3.amazonaws.com/blog_images/ocr_test.png
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"$TEST_IMAGE","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
 </code></pre>
 
 <p><strong>Response</strong></p>
