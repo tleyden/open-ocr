@@ -28,7 +28,11 @@
 
     <div class="container">
       <section id="main_content">
-        <p>OpenOCR makes it simple to host your own OCR REST API powered by <a href="https://code.google.com/p/tesseract-ocr/">Tesseract OCR</a></p>
+        <p>OpenOCR makes it simple to host your own OCR REST API.</p>
+
+<p>The heavy lifting OCR work is handled by <a href="https://code.google.com/p/tesseract-ocr/">Tesseract OCR</a>.</p>
+
+<p><a href="http://www.docker.io">Docker</a> is used to containerize the various components of the service.</p>
 
 <p><img src="http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png" alt="screenshot"></p>
 
@@ -47,11 +51,7 @@ for instructions on signing up and installing their CLI management tool.</p>
 <a name="find-out-your-orchard-host" class="anchor" href="#find-out-your-orchard-host"><span class="octicon octicon-link"></span></a>Find out your orchard host</h2>
 
 <pre><code>$ orchard hosts
-</code></pre>
-
-<p>and you should see a result like:</p>
-
-<pre><code>NAME                SIZE                IP
+NAME                SIZE                IP
 default             512M                107.170.72.189
 </code></pre>
 
@@ -67,8 +67,6 @@ $ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 </code></pre>
-
-<p><em>Note: as you may have noticed, you don't even need to clone this git repo!</em></p>
 
 <p>This will start three docker instances:</p>
 
