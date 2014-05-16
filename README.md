@@ -53,7 +53,7 @@ You are now ready to decode images -> text via your REST API.
 **Request**
 
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://cl.ly/image/132b2C0T1S3q/Screen%20Shot%202014-05-10%20at%2012.32.18%20PM.png","engine":0}' http://107.170.72.189:8081/ocr
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://tleyden-misc.s3.amazonaws.com/blog_images/ocr_test.png","engine":0}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
 ```
 
 **Response**
@@ -70,3 +70,4 @@ composed of alphanumeric characters and the underscore. In the example
 below I have used a few variations that work for variable names.
 
 ```
+
