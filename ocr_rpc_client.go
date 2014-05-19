@@ -125,7 +125,7 @@ func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string, rpcResponse
 
 	// declare a callback queue where we will receive rpc responses
 	callbackQueue, err := c.channel.QueueDeclare(
-		c.rabbitConfig.CallbackQueueName, // name
+		"",    // name -- let rabbit generate a random one
 		true,  // durable
 		false, // delete when usused
 		false, // exclusive

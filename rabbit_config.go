@@ -12,7 +12,6 @@ type RabbitConfig struct {
 	CallbackRoutingKey string
 	Reliable           bool
 	QueueName          string
-	CallbackQueueName  string
 }
 
 func DefaultTestConfig() RabbitConfig {
@@ -29,7 +28,6 @@ func DefaultTestConfig() RabbitConfig {
 		CallbackRoutingKey: "callback-key",
 		Reliable:           false, // setting to false because of observed issues
 		QueueName:          "test-queue",
-		CallbackQueueName:  "callback-queue",
 	}
 	return rabbitConfig
 
