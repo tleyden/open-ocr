@@ -3,9 +3,10 @@ package ocrworker
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/couchbaselabs/logg"
 	"github.com/streadway/amqp"
-	"time"
 )
 
 type OcrRpcWorker struct {
@@ -33,7 +34,7 @@ func (w OcrRpcWorker) Run() error {
 
 	var err error
 
-	logg.LogTo("OCR_WORKER", "Run() called")
+	logg.LogTo("OCR_WORKER", "Run() called.")
 
 	logg.LogTo("OCR_WORKER", "dialing %q", w.rabbitConfig.AmqpURI)
 	w.conn, err = amqp.Dial(w.rabbitConfig.AmqpURI)
