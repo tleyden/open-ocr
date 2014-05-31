@@ -2,12 +2,13 @@ package ocrworker
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/GeertJohan/go.leptonica"
 	"github.com/GeertJohan/go.tesseract"
 	"github.com/couchbaselabs/logg"
 	"github.com/nu7hatch/gouuid"
-	"os"
-	"path/filepath"
 )
 
 const TESSERACT_MODEL_DIR = "/usr/local/share/tessdata"
@@ -39,6 +40,7 @@ func (t TesseractEngine) ProcessImageUrl(imgUrl string) (OcrResult, error) {
 	}
 
 	pix, err := leptonica.NewPixFromFile(tmpFileName)
+	defer pix.Close()
 	if err != nil {
 		return OcrResult{}, err
 	}
