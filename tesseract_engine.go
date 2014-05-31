@@ -31,7 +31,7 @@ func (t TesseractEngine) ProcessImageUrl(imgUrl string) (OcrResult, error) {
 	if err != nil {
 		return OcrResult{}, err
 	}
-
+	defer os.Remove(tmpFileName)
 	// we have to write the contents of the image url to a temp
 	// file, because the leptonica lib can't seem to handle byte arrays
 	err = saveUrlContentToFileName(imgUrl, tmpFileName)
@@ -40,10 +40,11 @@ func (t TesseractEngine) ProcessImageUrl(imgUrl string) (OcrResult, error) {
 	}
 
 	pix, err := leptonica.NewPixFromFile(tmpFileName)
-	defer pix.Close()
+
 	if err != nil {
 		return OcrResult{}, err
 	}
+	defer pix.Close()
 
 	// set the image to the tesseract instance
 	tess.SetImagePix(pix)
