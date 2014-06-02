@@ -3,10 +3,11 @@ package ocrworker
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/couchbaselabs/logg"
 	"github.com/nu7hatch/gouuid"
 	"github.com/streadway/amqp"
-	"time"
 )
 
 const (
@@ -126,9 +127,9 @@ func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string, rpcResponse
 	// declare a callback queue where we will receive rpc responses
 	callbackQueue, err := c.channel.QueueDeclare(
 		"",    // name -- let rabbit generate a random one
-		true,  // durable
-		false, // delete when usused
-		false, // exclusive
+		false, // durable
+		true,  // delete when usused
+		true,  // exclusive
 		false, // noWait
 		nil,   // arguments
 	)
