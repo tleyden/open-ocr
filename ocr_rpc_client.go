@@ -76,7 +76,7 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 
 	rpcResponseChan := make(chan OcrResult)
 
-	err = c.subscribeCallbackQueue(correlationUuid, rpcResponseChan)
+	callbackQueue, err := c.subscribeCallbackQueue(correlationUuid, rpcResponseChan)
 	if err != nil {
 		return OcrResult{}, err
 	}
@@ -105,7 +105,7 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 			Body:            []byte(ocrRequestJson),
 			DeliveryMode:    amqp.Transient, // 1=non-persistent, 2=persistent
 			Priority:        0,              // 0-9
-			ReplyTo:         c.rabbitConfig.CallbackRoutingKey,
+			ReplyTo:         callbackQueue.Name,
 			CorrelationId:   correlationUuid,
 			// a bunch of application/implementation-specific fields
 		},
@@ -122,7 +122,7 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 
 }
 
-func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string, rpcResponseChan chan OcrResult) error {
+func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string, rpcResponseChan chan OcrResult) (amqp.Queue, error) {
 
 	// declare a callback queue where we will receive rpc responses
 	callbackQueue, err := c.channel.QueueDeclare(
@@ -134,18 +134,18 @@ func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string, rpcResponse
 		nil,   // arguments
 	)
 	if err != nil {
-		return err
+		return amqp.Queue{}, err
 	}
 
 	// bind the callback queue to an exchange + routing key
 	if err = c.channel.QueueBind(
-		callbackQueue.Name,                // name of the queue
-		c.rabbitConfig.CallbackRoutingKey, // bindingKey
-		c.rabbitConfig.Exchange,           // sourceExchange
+		callbackQueue.Name,      // name of the queue
+		callbackQueue.Name,      // bindingKey
+		c.rabbitConfig.Exchange, // sourceExchange
 		false, // noWait
 		nil,   // arguments
 	); err != nil {
-		return err
+		return amqp.Queue{}, err
 	}
 
 	logg.LogTo("OCR_CLIENT", "callbackQueue name: %v", callbackQueue.Name)
@@ -160,12 +160,12 @@ func (c OcrRpcClient) subscribeCallbackQueue(correlationUuid string, rpcResponse
 		nil,                // arguments
 	)
 	if err != nil {
-		return err
+		return amqp.Queue{}, err
 	}
 
 	go c.handleRpcResponse(deliveries, correlationUuid, rpcResponseChan)
 
-	return nil
+	return callbackQueue, nil
 
 }
 
