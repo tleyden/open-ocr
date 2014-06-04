@@ -56,6 +56,7 @@ func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResu
 	if err != nil {
 		return OcrResult{}, err
 	}
+	defer c.connection.Close()
 
 	c.channel, err = c.connection.Channel()
 	if err != nil {
@@ -181,8 +182,6 @@ func (c OcrRpcClient) handleRpcResponse(deliveries <-chan amqp.Delivery, correla
 				d.Body,
 				d.ReplyTo,
 			)
-
-			defer c.connection.Close()
 
 			ocrResult := OcrResult{
 				Text: string(d.Body),
