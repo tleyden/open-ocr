@@ -34,7 +34,7 @@ func (w OcrRpcWorker) Run() error {
 
 	var err error
 
-	logg.LogTo("OCR_WORKER", "Run() called..")
+	logg.LogTo("OCR_WORKER", "Run() called...")
 
 	logg.LogTo("OCR_WORKER", "dialing %q", w.rabbitConfig.AmqpURI)
 	w.conn, err = amqp.Dial(w.rabbitConfig.AmqpURI)
