@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/couchbaselabs/logg"
 	"github.com/tleyden/open-ocr"
 )
@@ -21,13 +23,19 @@ func main() {
 	noOpFlagFunc := ocrworker.NoOpFlagFunction()
 	rabbitConfig := ocrworker.DefaultConfigFlagsOverride(noOpFlagFunc)
 
-	ocrWorker, err := ocrworker.NewOcrRpcWorker(rabbitConfig)
-	if err != nil {
-		logg.LogPanic("Could not create rpc worker")
-	}
-	ocrWorker.Run()
+	// inifinite loop, since sometimes worker <-> rabbitmq connection
+	// gets broken.  see https://github.com/tleyden/open-ocr/issues/4
+	for {
+		logg.LogTo("OCR_WORKER", "Creating new OCR Worker")
+		ocrWorker, err := ocrworker.NewOcrRpcWorker(rabbitConfig)
+		if err != nil {
+			logg.LogPanic("Could not create rpc worker")
+		}
+		ocrWorker.Run()
 
-	err = <-ocrWorker.Done
-	logg.LogPanic("Worker failed with error: %v", err)
+		// this happens when connection is closed
+		err = <-ocrWorker.Done
+		logg.LogError(fmt.Errorf("OCR Worker failed with error: %v", err))
+	}
 
 }

@@ -150,7 +150,7 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 
 	}
 	logg.LogTo("OCR_WORKER", "handle: deliveries channel closed")
-	done <- nil
+	done <- fmt.Errorf("handle: deliveries channel closed")
 }
 
 func (w *OcrRpcWorker) resultForDelivery(d amqp.Delivery) (OcrResult, error) {
