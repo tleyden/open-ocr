@@ -9,7 +9,7 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 # Launching OpenOCR on Orchard
 
-There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms.
+There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms such as [Tutum.co](http://www.tutum.co), [GCE](http://docs.docker.io/installation/google/), etc.
 
 ## Install Orchard CLI tool
 
