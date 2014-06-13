@@ -16,7 +16,7 @@ There are several [docker](http://www.docker.io) PAAS platforms available, and O
 See the [Orchard Getting Started Guide](https://www.orchardup.com/docs)
 for instructions on signing up and installing their CLI management tool.
 
-## Find out your orchard host
+## Find out your host address
 
 ```
 $ orchard hosts
@@ -24,7 +24,7 @@ NAME                SIZE                IP
 default             512M                107.170.72.189
 ```
 
-The ip address `107.170.72.189` will be used as the `ORCHARD_HOST` env variable below.
+The ip address `107.170.72.189` will be used as the `DOCKER_HOST` env variable below.
 
 ## Launch docker images
 
@@ -32,7 +32,7 @@ Here's how to launch the docker images needed for OpenOCR.
 
 ```
 $ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
-$ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ export DOCKER_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 ```
@@ -50,7 +50,7 @@ You are now ready to decode images -> text via your REST API.
 **Request**
 
 ```
-$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$DOCKER_HOST:$HTTP_PORT/ocr
 ```
 
 **Response**
