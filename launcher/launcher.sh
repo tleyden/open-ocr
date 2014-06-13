@@ -2,14 +2,19 @@
 
 # Launches all components of the OpenOCR service on the Orchard Docker PAAS
 # 
+# For DOCKER_HOST value, you should get the host of your Orchard VM by running:
+# 
+# $ orchard hosts
+#
 # To run this script:
-# $ export ORCHARD_HOST=107.170.72.189
+#
+# $ export DOCKER_HOST=107.170.72.189
 # $ export RABBITMQ_PASS=supersecret2
 # $ export HTTP_PORT=8080  
 # $ ./launcher.sh
 
-if [ ! -n "$ORCHARD_HOST" ] ; then
-  echo "You must define ORCHARD_HOST"
+if [ ! -n "$DOCKER_HOST" ] ; then
+  echo "You must define DOCKER_HOST"
   exit
 fi
 
@@ -23,7 +28,7 @@ if [ ! -n "$HTTP_PORT" ] ; then
   exit
 fi
 
-export AMQP_URI=amqp://admin:${RABBITMQ_PASS}@${ORCHARD_HOST}/
+export AMQP_URI=amqp://admin:${RABBITMQ_PASS}@${DOCKER_HOST}/
 
 orchard docker run -d -p 5672:5672 -p 15672:15672 -e RABBITMQ_PASS=${RABBITMQ_PASS} tutum/rabbitmq
 
