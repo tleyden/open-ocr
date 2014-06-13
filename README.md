@@ -68,11 +68,11 @@ below I have used a few variations that work for variable names.
 
 ```
 
-# Launching OpenOCR on Docker PAAS services
+# Launching on a Docker PAAS
 
-There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms such as [Tutum.co](http://www.tutum.co), [GCE](http://docs.docker.io/installation/google/), etc.
+* [Launch OpenOCR on Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
 
-* [Orchard Instructions](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
+*More coming soon ..*
 
 # License
 
