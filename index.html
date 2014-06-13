@@ -37,25 +37,23 @@
 <p><img src="http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png" alt="screenshot"></p>
 
 <h1>
-<a name="launching-openocr-on-orchard" class="anchor" href="#launching-openocr-on-orchard"><span class="octicon octicon-link"></span></a>Launching OpenOCR on Orchard</h1>
-
-<p>There are several <a href="http://www.docker.io">docker</a> PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards <a href="http://www.orchardup.com">Orchard</a>, but should be easily adaptable to other platforms such as <a href="http://www.tutum.co">Tutum.co</a>, <a href="http://docs.docker.io/installation/google/">GCE</a>, etc.</p>
+<a name="launching-openocr-on-ubuntu-1404" class="anchor" href="#launching-openocr-on-ubuntu-1404"><span class="octicon octicon-link"></span></a>Launching OpenOCR on Ubuntu 14.04</h1>
 
 <h2>
-<a name="install-orchard-cli-tool" class="anchor" href="#install-orchard-cli-tool"><span class="octicon octicon-link"></span></a>Install Orchard CLI tool</h2>
+<a name="install-docker" class="anchor" href="#install-docker"><span class="octicon octicon-link"></span></a>Install Docker</h2>
 
-<p>See the <a href="https://www.orchardup.com/docs">Orchard Getting Started Guide</a>
-for instructions on signing up and installing their CLI management tool.</p>
+<p>See <a href="https://docs.docker.com/installation/ubuntulinux/">Installing Docker on Ubuntu</a> instructions.</p>
 
 <h2>
 <a name="find-out-your-host-address" class="anchor" href="#find-out-your-host-address"><span class="octicon octicon-link"></span></a>Find out your host address</h2>
 
-<pre><code>$ orchard hosts
-NAME                SIZE                IP
-default             512M                107.170.72.189
+<pre><code>$ ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:43:40:c7
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          ...
 </code></pre>
 
-<p>The ip address <code>107.170.72.189</code> will be used as the <code>DOCKER_HOST</code> env variable below.</p>
+<p>The ip address <code>10.0.2.15</code> will be used as the <code>DOCKER_HOST</code> env variable below.</p>
 
 <h2>
 <a name="launch-docker-images" class="anchor" href="#launch-docker-images"><span class="octicon octicon-link"></span></a>Launch docker images</h2>
@@ -63,7 +61,7 @@ default             512M                107.170.72.189
 <p>Here's how to launch the docker images needed for OpenOCR.</p>
 
 <pre><code>$ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
-$ export DOCKER_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ export DOCKER_HOST=10.0.2.15 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 </code></pre>
@@ -99,6 +97,13 @@ composed of alphanumeric characters and the underscore. In the example
 below I have used a few variations that work for variable names.
 
 </code></pre>
+
+<h1>
+<a name="launching-on-a-docker-paas" class="anchor" href="#launching-on-a-docker-paas"><span class="octicon octicon-link"></span></a>Launching on a Docker PAAS</h1>
+
+<ul>
+<li><a href="https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard">Launch OpenOCR on Orchard</a></li>
+</ul><p><em>More coming soon ..</em></p>
 
 <h1>
 <a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
