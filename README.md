@@ -41,7 +41,7 @@ This will start three docker instances:
 * [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 * [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 
-You are now ready to decode images -> text via your REST API.
+You are now ready to decode images → text via your REST API.
 
 # Test the REST API 
 
