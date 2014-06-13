@@ -8,14 +8,14 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-    <title>Open-ocr by tleyden</title>
+    <title>OpenOCR by tleyden</title>
   </head>
 
   <body>
 
     <header>
       <div class="container">
-        <h1>Open-ocr</h1>
+        <h1>OpenOCR</h1>
         <h2>Open source OCR-as-a-Service using Tesseract and Docker</h2>
 
         <section id="downloads">
@@ -39,7 +39,7 @@
 <h1>
 <a name="launching-openocr-on-orchard" class="anchor" href="#launching-openocr-on-orchard"><span class="octicon octicon-link"></span></a>Launching OpenOCR on Orchard</h1>
 
-<p>There are several <a href="http://www.docker.io">docker</a> PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards <a href="http://www.orchardup.com">Orchard</a>, but should be easily adaptable to other platforms.</p>
+<p>There are several <a href="http://www.docker.io">docker</a> PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards <a href="http://www.orchardup.com">Orchard</a>, but should be easily adaptable to other platforms such as <a href="http://www.tutum.co">Tutum.co</a>, <a href="http://docs.docker.io/installation/google/">GCE</a>, etc.</p>
 
 <h2>
 <a name="install-orchard-cli-tool" class="anchor" href="#install-orchard-cli-tool"><span class="octicon octicon-link"></span></a>Install Orchard CLI tool</h2>
@@ -48,14 +48,14 @@
 for instructions on signing up and installing their CLI management tool.</p>
 
 <h2>
-<a name="find-out-your-orchard-host" class="anchor" href="#find-out-your-orchard-host"><span class="octicon octicon-link"></span></a>Find out your orchard host</h2>
+<a name="find-out-your-host-address" class="anchor" href="#find-out-your-host-address"><span class="octicon octicon-link"></span></a>Find out your host address</h2>
 
 <pre><code>$ orchard hosts
 NAME                SIZE                IP
 default             512M                107.170.72.189
 </code></pre>
 
-<p>The ip address <code>107.170.72.189</code> will be used as the <code>ORCHARD_HOST</code> env variable below.</p>
+<p>The ip address <code>107.170.72.189</code> will be used as the <code>DOCKER_HOST</code> env variable below.</p>
 
 <h2>
 <a name="launch-docker-images" class="anchor" href="#launch-docker-images"><span class="octicon octicon-link"></span></a>Launch docker images</h2>
@@ -63,7 +63,7 @@ default             512M                107.170.72.189
 <p>Here's how to launch the docker images needed for OpenOCR.</p>
 
 <pre><code>$ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
-$ export ORCHARD_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ export DOCKER_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 </code></pre>
@@ -81,7 +81,7 @@ $ ./launcher.sh
 
 <p><strong>Request</strong></p>
 
-<pre><code>$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$ORCHARD_HOST:$HTTP_PORT/ocr
+<pre><code>$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$DOCKER_HOST:$HTTP_PORT/ocr
 </code></pre>
 
 <p><strong>Response</strong></p>
