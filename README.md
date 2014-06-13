@@ -7,24 +7,22 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
-# Launching OpenOCR on Orchard
+# Launching OpenOCR on Ubuntu 14.04
 
-There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms such as [Tutum.co](http://www.tutum.co), [GCE](http://docs.docker.io/installation/google/), etc.
+## Install Docker
 
-## Install Orchard CLI tool
-
-See the [Orchard Getting Started Guide](https://www.orchardup.com/docs)
-for instructions on signing up and installing their CLI management tool.
+See [Installing Docker on Ubuntu](https://docs.docker.com/installation/ubuntulinux/) instructions.
 
 ## Find out your host address
 
 ```
-$ orchard hosts
-NAME                SIZE                IP
-default             512M                107.170.72.189
+$ ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:43:40:c7
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          ...
 ```
 
-The ip address `107.170.72.189` will be used as the `DOCKER_HOST` env variable below.
+The ip address `10.0.2.15` will be used as the `DOCKER_HOST` env variable below.
 
 ## Launch docker images
 
@@ -32,7 +30,7 @@ Here's how to launch the docker images needed for OpenOCR.
 
 ```
 $ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
-$ export DOCKER_HOST=107.170.72.189 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ export DOCKER_HOST=10.0.2.15 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 ```
@@ -69,6 +67,12 @@ composed of alphanumeric characters and the underscore. In the example
 below I have used a few variations that work for variable names.
 
 ```
+
+# Launching OpenOCR on Docker PAAS services
+
+There are several [docker](http://www.docker.io) PAAS platforms available, and OpenOCR should work on all of them.  The following instructions are geared towards [Orchard](http://www.orchardup.com), but should be easily adaptable to other platforms such as [Tutum.co](http://www.tutum.co), [GCE](http://docs.docker.io/installation/google/), etc.
+
+* [Orchard Instructions](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
 
 # License
 
