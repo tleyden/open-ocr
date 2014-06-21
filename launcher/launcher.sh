@@ -28,6 +28,8 @@ fi
 
 if [ "$1" == "orchard" ] ; then
       export DOCKER="orchard docker" 
+elif [ "$1" == "gce" ] ; then
+      export DOCKER="sudo docker" 
 else
       export DOCKER="docker"
 fi
