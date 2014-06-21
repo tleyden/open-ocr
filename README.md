@@ -76,6 +76,11 @@ You can also run OpenOCR on any PAAS that supports Docker containers.  Here are 
 * [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
 * More coming soon ..
 
+# Community
+
+* Follow [@OpenOCR](https://twitter.com/openocr) on Twitter
+* Checkout the [Github issue tracker](https://github.com/tleyden/open-ocr/issues)
+
 # License
 
 OpenOCR is Open Source and available under the Apache 2 License.
