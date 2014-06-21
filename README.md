@@ -70,6 +70,8 @@ below I have used a few variations that work for variable names.
 
 # Launching OpenOCR on a Docker PAAS
 
+You can also run OpenOCR on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:
+
 * [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
 * [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
 * More coming soon ..
