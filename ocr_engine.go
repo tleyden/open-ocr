@@ -2,8 +2,9 @@ package ocrworker
 
 import (
 	"encoding/json"
-	"github.com/couchbaselabs/logg"
 	"strings"
+
+	"github.com/couchbaselabs/logg"
 )
 
 type OcrEngineType int
@@ -15,6 +16,7 @@ const (
 
 type OcrEngine interface {
 	ProcessImageUrl(imgUrl string) (OcrResult, error)
+	ProcessImageBytes(imgBytes []byte) (OcrResult, error)
 }
 
 func NewOcrEngine(engineType OcrEngineType) OcrEngine {
@@ -25,6 +27,16 @@ func NewOcrEngine(engineType OcrEngineType) OcrEngine {
 		return &TesseractEngine{}
 	}
 	return nil
+}
+
+func (e OcrEngineType) String() string {
+	switch e {
+	case ENGINE_MOCK:
+		return "ENGINE_MOCK"
+	case ENGINE_TESSERACT:
+		return "ENGINE_TESSERACT"
+	}
+	return ""
 }
 
 func (e *OcrEngineType) UnmarshalJSON(b []byte) (err error) {

@@ -31,19 +31,34 @@ func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 	return ocrRpcClient, nil
 }
 
-func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResult, error) {
+func (c *OcrRpcClient) DecodeImageBytes(imgBytes []byte, eng OcrEngineType) (OcrResult, error) {
 
-	var err error
+	ocrRequest := OcrRequest{
+		ImgBytes:   imgBytes,
+		EngineType: eng,
+	}
+	return c.DecodeImage(ocrRequest, eng)
+
+}
+
+func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResult, error) {
 
 	ocrRequest := OcrRequest{
 		ImgUrl:     imgUrl,
 		EngineType: eng,
 	}
+
+	return c.DecodeImage(ocrRequest, eng)
+
+}
+
+func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest, eng OcrEngineType) (OcrResult, error) {
+	var err error
+
 	ocrRequestJson, err := json.Marshal(ocrRequest)
 	if err != nil {
 		return OcrResult{}, err
 	}
-	logg.LogTo("OCR_CLIENT", "requestJson: %v", string(ocrRequestJson))
 
 	correlationUuidRaw, err := uuid.NewV4()
 	if err != nil {

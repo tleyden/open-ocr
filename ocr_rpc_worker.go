@@ -125,10 +125,9 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 	for d := range deliveries {
 		logg.LogTo(
 			"OCR_WORKER",
-			"got %dB delivery: [%v] %q.  Reply to: %v",
+			"got %d byte delivery: [%v].  Reply to: %v",
 			len(d.Body),
 			d.DeliveryTag,
-			d.Body,
 			d.ReplyTo,
 		)
 
@@ -168,8 +167,14 @@ func (w *OcrRpcWorker) resultForDelivery(d amqp.Delivery) (OcrResult, error) {
 
 	ocrEngine := NewOcrEngine(ocrRequest.EngineType)
 
-	logg.LogTo("OCR_WORKER", "body: %v", string(d.Body))
-	ocrResult, err = ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
+	if ocrRequest.ImgUrl != "" {
+		logg.LogTo("OCR_WORKER", "Decoding image url: %v with engine: %v", ocrRequest.ImgUrl, ocrRequest.EngineType)
+		ocrResult, err = ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
+	} else {
+		logg.LogTo("OCR_WORKER", "Decoding image bytes with engine: %v", ocrRequest.EngineType)
+		ocrResult, err = ocrEngine.ProcessImageBytes(ocrRequest.ImgBytes)
+	}
+
 	if err != nil {
 		msg := "Error processing image url: %v.  Error: %v"
 		errMsg := fmt.Sprintf(msg, ocrRequest.ImgUrl, err)
