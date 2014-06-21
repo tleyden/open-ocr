@@ -72,7 +72,7 @@ below I have used a few variations that work for variable names.
 
 * [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
 * [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
-*More coming soon ..*
+* More coming soon ..
 
 # License
 
