@@ -68,10 +68,10 @@ below I have used a few variations that work for variable names.
 
 ```
 
-# Launching on a Docker PAAS
+# Launching OpenOCR on a Docker PAAS
 
-* [Launch OpenOCR on Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
-
+* [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
+* [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
 *More coming soon ..*
 
 # License
