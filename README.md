@@ -7,6 +7,12 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
+# Features
+
+* Scalable message passing architecture
+* Platform independence via Docker containers
+* Improved accuracy via [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) image preprocessing.
+
 # Launching OpenOCR on Ubuntu 14.04
 
 ## Install Docker
