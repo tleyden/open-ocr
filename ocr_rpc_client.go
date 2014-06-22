@@ -34,11 +34,6 @@ func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 	var err error
 
-	ocrRequestJson, err := json.Marshal(ocrRequest)
-	if err != nil {
-		return OcrResult{}, err
-	}
-
 	correlationUuidRaw, err := uuid.NewV4()
 	if err != nil {
 		return OcrResult{}, err
@@ -88,9 +83,19 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 		defer confirmDelivery(ack, nack)
 	}
 
+	logg.LogTo("OCR_CLIENT", "ocrRequest before: %v", ocrRequest)
+	routingKey := ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey)
+	logg.LogTo("OCR_CLIENT", "publishing with routing key %q", routingKey)
+	logg.LogTo("OCR_CLIENT", "ocrRequest after: %v", ocrRequest)
+
+	ocrRequestJson, err := json.Marshal(ocrRequest)
+	if err != nil {
+		return OcrResult{}, err
+	}
+
 	if err = c.channel.Publish(
 		c.rabbitConfig.Exchange, // publish to an exchange
-		ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey),
+		routingKey,
 		false, // mandatory
 		false, // immediate
 		amqp.Publishing{

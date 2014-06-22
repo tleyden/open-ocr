@@ -76,6 +76,8 @@ func (w OcrRpcWorker) Run() error {
 		return err
 	}
 
+	logg.LogTo("OCR_WORKER", "binding to: %v", w.rabbitConfig.RoutingKey)
+
 	if err = w.channel.QueueBind(
 		queue.Name,                // name of the queue
 		w.rabbitConfig.RoutingKey, // bindingKey
@@ -125,9 +127,10 @@ func (w *OcrRpcWorker) handle(deliveries <-chan amqp.Delivery, done chan error) 
 	for d := range deliveries {
 		logg.LogTo(
 			"OCR_WORKER",
-			"got %d byte delivery: [%v].  Reply to: %v",
+			"got %d byte delivery: [%v]. Routing key: %v  Reply to: %v",
 			len(d.Body),
 			d.DeliveryTag,
+			d.RoutingKey,
 			d.ReplyTo,
 		)
 
