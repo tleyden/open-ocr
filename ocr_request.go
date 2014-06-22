@@ -3,11 +3,11 @@ package ocrworker
 import "fmt"
 
 type OcrRequest struct {
-	ImgUrl            string        `json:"img_url"`
-	EngineType        OcrEngineType `json:"engine"`
-	ImgBytes          []byte        `json:"img_bytes"`
-	PreprocessorChain []string      `json:"preprocessors"`
-	PreprocessorArgs  interface{}   `json:"preprocessor-args"`
+	ImgUrl            string                 `json:"img_url"`
+	EngineType        OcrEngineType          `json:"engine"`
+	ImgBytes          []byte                 `json:"img_bytes"`
+	PreprocessorChain []string               `json:"preprocessors"`
+	PreprocessorArgs  map[string]interface{} `json:"preprocessor-args"`
 }
 
 // 		ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey),
