@@ -3,12 +3,10 @@ package ocrworker
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/GeertJohan/go.leptonica"
 	"github.com/GeertJohan/go.tesseract"
 	"github.com/couchbaselabs/logg"
-	"github.com/nu7hatch/gouuid"
 )
 
 const TESSERACT_MODEL_DIR = "/usr/local/share/tessdata"
@@ -81,14 +79,4 @@ func (t TesseractEngine) ProcessImageUrl(imgUrl string) (OcrResult, error) {
 
 	return t.processImageFile(tmpFileName)
 
-}
-
-func createTempFileName() (string, error) {
-	tempDir := os.TempDir()
-	uuidRaw, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
-	uuidStr := uuidRaw.String()
-	return filepath.Join(tempDir, uuidStr), nil
 }

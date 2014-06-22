@@ -3,6 +3,9 @@ package ocrworker
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"os/exec"
 
 	"github.com/couchbaselabs/logg"
 	"github.com/streadway/amqp"
@@ -14,17 +17,20 @@ type PreprocessorRpcWorker struct {
 	channel      *amqp.Channel
 	tag          string
 	Done         chan error
+	bindingKey   string
 }
 
 const preprocessor_tag = "preprocessor" // TODO: should be unique for each worker instance (eg, uuid)
 
 func NewPreprocessorRpcWorker(rc RabbitConfig) (*PreprocessorRpcWorker, error) {
+
 	preprocessorRpcWorker := &PreprocessorRpcWorker{
 		rabbitConfig: rc,
 		conn:         nil,
 		channel:      nil,
 		tag:          preprocessor_tag,
 		Done:         make(chan error),
+		bindingKey:   "stroke-width-transform",
 	}
 	return preprocessorRpcWorker, nil
 }
@@ -65,8 +71,7 @@ func (w PreprocessorRpcWorker) Run() error {
 
 	// just call the queue the same name as the binding key, since
 	// there is no reason to have a different name.
-	bindingKey := "stroke-width-transform"
-	queueName := bindingKey
+	queueName := w.bindingKey
 
 	queue, err := w.channel.QueueDeclare(
 		queueName, // name of the queue
@@ -82,7 +87,7 @@ func (w PreprocessorRpcWorker) Run() error {
 
 	if err = w.channel.QueueBind(
 		queue.Name,              // name of the queue
-		bindingKey,              // bindingKey
+		w.bindingKey,            // bindingKey
 		w.rabbitConfig.Exchange, // sourceExchange
 		false, // noWait
 		nil,   // arguments
@@ -90,7 +95,7 @@ func (w PreprocessorRpcWorker) Run() error {
 		return err
 	}
 
-	logg.LogTo("PREPROCESSOR_WORKER", "Queue bound to Exchange, starting Consume (consumer tag %q, binding key: %v)", preprocessor_tag, bindingKey)
+	logg.LogTo("PREPROCESSOR_WORKER", "Queue bound to Exchange, starting Consume (consumer tag %q, binding key: %v)", preprocessor_tag, w.bindingKey)
 	deliveries, err := w.channel.Consume(
 		queue.Name,       // name
 		preprocessor_tag, // consumerTag,
@@ -147,6 +152,69 @@ func (w *PreprocessorRpcWorker) handle(deliveries <-chan amqp.Delivery, done cha
 	done <- fmt.Errorf("handle: deliveries channel closed")
 }
 
+func (w *PreprocessorRpcWorker) strokeWidthTransform(ocrRequest *OcrRequest) error {
+
+	// write bytes to a temp file
+
+	tmpFileNameInput, err := createTempFileName()
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmpFileNameInput)
+
+	tmpFileNameOutput, err := createTempFileName()
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmpFileNameOutput)
+
+	err = saveBytesToFileName(ocrRequest.ImgBytes, tmpFileNameInput)
+	if err != nil {
+		return err
+	}
+
+	// run DecodeText binary on it (if not in path, print warning and do nothing)
+	darkOnLightSetting := "1" // todo: this should be passed as a param.
+	out, err := exec.Command(
+		"DetectText",
+		tmpFileNameInput,
+		tmpFileNameOutput,
+		darkOnLightSetting,
+	).CombinedOutput()
+	if err != nil {
+		logg.LogFatal("Error running command: %s.  out: %s", err, out)
+	}
+	logg.LogTo("PREPROCESSOR_WORKER", "output: %v", string(out))
+
+	// read bytes from output file into ocrRequest.ImgBytes
+	resultBytes, err := ioutil.ReadFile(tmpFileNameOutput)
+	if err != nil {
+		return err
+	}
+
+	ocrRequest.ImgBytes = resultBytes
+
+	return nil
+
+}
+
+func (w *PreprocessorRpcWorker) preprocessImage(ocrRequest *OcrRequest) error {
+
+	switch w.bindingKey {
+	case "stroke-width-transform":
+		logg.LogTo("PREPROCESSOR_WORKER", "do stroke-width-transform")
+		err := w.strokeWidthTransform(ocrRequest)
+		if err != nil {
+			msg := "Error doing stroke width transform on: %v.  Error: %v"
+			errMsg := fmt.Sprintf(msg, ocrRequest, err)
+			logg.LogError(fmt.Errorf(errMsg))
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (w *PreprocessorRpcWorker) handleDelivery(d amqp.Delivery) error {
 
 	ocrRequest := OcrRequest{}
@@ -163,7 +231,13 @@ func (w *PreprocessorRpcWorker) handleDelivery(d amqp.Delivery) error {
 	logg.LogTo("PREPROCESSOR_WORKER", "publishing with routing key %q", routingKey)
 	logg.LogTo("PREPROCESSOR_WORKER", "ocrRequest after: %v", ocrRequest)
 
-	// TODO: process the image and then re-marshal ocrRequest
+	err = w.preprocessImage(&ocrRequest)
+	if err != nil {
+		msg := "Error preprocessing image: %v.  Error: %v"
+		errMsg := fmt.Sprintf(msg, ocrRequest, err)
+		logg.LogError(fmt.Errorf(errMsg))
+		return err
+	}
 
 	ocrRequestJson, err := json.Marshal(ocrRequest)
 	if err != nil {

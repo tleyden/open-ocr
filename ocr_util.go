@@ -3,6 +3,10 @@ package ocrworker
 import (
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
+
+	"github.com/nu7hatch/gouuid"
 )
 
 func saveUrlContentToFileName(url, tmpFileName string) error {
@@ -44,4 +48,14 @@ func url2bytes(url string) ([]byte, error) {
 
 	return bodyBytes, nil
 
+}
+
+func createTempFileName() (string, error) {
+	tempDir := os.TempDir()
+	uuidRaw, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	uuidStr := uuidRaw.String()
+	return filepath.Join(tempDir, uuidStr), nil
 }
