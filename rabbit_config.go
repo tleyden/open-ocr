@@ -21,11 +21,11 @@ func DefaultTestConfig() RabbitConfig {
 
 	rabbitConfig := RabbitConfig{
 		AmqpURI:      "amqp://guest:guest@localhost:5672/",
-		Exchange:     "test-exchange",
+		Exchange:     "open-ocr-exchange",
 		ExchangeType: "direct",
-		RoutingKey:   "test-key",
+		RoutingKey:   "decode-ocr",
 		Reliable:     false, // setting to false because of observed issues
-		QueueName:    "test-queue",
+		QueueName:    "open-ocr-queue",
 	}
 	return rabbitConfig
 
