@@ -44,7 +44,7 @@ func main() {
 			preprocessor,
 		)
 		if err != nil {
-			logg.LogPanic("Could not create rpc worker")
+			logg.LogPanic("Could not create rpc worker: %v", err)
 		}
 		preprocessorWorker.Run()
 

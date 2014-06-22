@@ -29,6 +29,11 @@ func NewPreprocessorRpcWorker(rc RabbitConfig, preprocessor string) (*Preprocess
 	preprocessorMap[PREPROCESSOR_STROKE_WIDTH_TRANSFORM] = StrokeWidthTransformer{}
 	preprocessorMap[PREPROCESSOR_IDENTITY] = IdentityPreprocessor{}
 
+	_, ok := preprocessorMap[preprocessor]
+	if !ok {
+		return nil, fmt.Errorf("No preprocessor found for: %q", preprocessor)
+	}
+
 	preprocessorRpcWorker := &PreprocessorRpcWorker{
 		rabbitConfig:    rc,
 		conn:            nil,
