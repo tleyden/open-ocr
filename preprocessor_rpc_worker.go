@@ -12,25 +12,31 @@ import (
 )
 
 type PreprocessorRpcWorker struct {
-	rabbitConfig RabbitConfig
-	conn         *amqp.Connection
-	channel      *amqp.Channel
-	tag          string
-	Done         chan error
-	bindingKey   string
+	rabbitConfig    RabbitConfig
+	conn            *amqp.Connection
+	channel         *amqp.Channel
+	tag             string
+	Done            chan error
+	bindingKey      string
+	preprocessorMap map[string]Preprocessor
 }
 
 const preprocessor_tag = "preprocessor" // TODO: should be unique for each worker instance (eg, uuid)
 
-func NewPreprocessorRpcWorker(rc RabbitConfig) (*PreprocessorRpcWorker, error) {
+func NewPreprocessorRpcWorker(rc RabbitConfig, preprocessor string) (*PreprocessorRpcWorker, error) {
+
+	preprocessorMap := make(map[string]Preprocessor)
+	preprocessorMap[PREPROCESSOR_STROKE_WIDTH_TRANSFORM] = StrokeWidthTransformer{}
+	preprocessorMap[PREPROCESSOR_IDENTITY] = IdentityPreprocessor{}
 
 	preprocessorRpcWorker := &PreprocessorRpcWorker{
-		rabbitConfig: rc,
-		conn:         nil,
-		channel:      nil,
-		tag:          preprocessor_tag,
-		Done:         make(chan error),
-		bindingKey:   "stroke-width-transform",
+		rabbitConfig:    rc,
+		conn:            nil,
+		channel:         nil,
+		tag:             preprocessor_tag,
+		Done:            make(chan error),
+		bindingKey:      preprocessor,
+		preprocessorMap: preprocessorMap,
 	}
 	return preprocessorRpcWorker, nil
 }
@@ -152,6 +158,23 @@ func (w *PreprocessorRpcWorker) handle(deliveries <-chan amqp.Delivery, done cha
 	done <- fmt.Errorf("handle: deliveries channel closed")
 }
 
+func (w *PreprocessorRpcWorker) preprocessImage(ocrRequest *OcrRequest) error {
+
+	descriptor := w.bindingKey // eg, "stroke-width-transform"
+	preprocessor := w.preprocessorMap[descriptor]
+	logg.LogTo("PREPROCESSOR_WORKER", "Preproces %v via %v", ocrRequest, descriptor)
+
+	err := preprocessor.preprocess(ocrRequest)
+	if err != nil {
+		msg := "Error doing %s on: %v.  Error: %v"
+		errMsg := fmt.Sprintf(msg, descriptor, ocrRequest, err)
+		logg.LogError(fmt.Errorf(errMsg))
+		return err
+	}
+	return nil
+
+}
+
 func (w *PreprocessorRpcWorker) strokeWidthTransform(ocrRequest *OcrRequest) error {
 
 	// write bytes to a temp file
@@ -196,23 +219,6 @@ func (w *PreprocessorRpcWorker) strokeWidthTransform(ocrRequest *OcrRequest) err
 
 	return nil
 
-}
-
-func (w *PreprocessorRpcWorker) preprocessImage(ocrRequest *OcrRequest) error {
-
-	switch w.bindingKey {
-	case "stroke-width-transform":
-		logg.LogTo("PREPROCESSOR_WORKER", "do stroke-width-transform")
-		err := w.strokeWidthTransform(ocrRequest)
-		if err != nil {
-			msg := "Error doing stroke width transform on: %v.  Error: %v"
-			errMsg := fmt.Sprintf(msg, ocrRequest, err)
-			logg.LogError(fmt.Errorf(errMsg))
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (w *PreprocessorRpcWorker) handleDelivery(d amqp.Delivery) error {

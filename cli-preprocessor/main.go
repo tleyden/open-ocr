@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/couchbaselabs/logg"
@@ -21,14 +22,27 @@ func init() {
 
 func main() {
 
-	noOpFlagFunc := ocrworker.NoOpFlagFunction()
-	rabbitConfig := ocrworker.DefaultConfigFlagsOverride(noOpFlagFunc)
+	var preprocessor string
+	flagFunc := func() {
+		flag.StringVar(
+			&preprocessor,
+			"preprocessor",
+			"identity",
+			"The preprocessor to use, eg, stroke-width-transform",
+		)
+
+	}
+
+	rabbitConfig := ocrworker.DefaultConfigFlagsOverride(flagFunc)
 
 	// inifinite loop, since sometimes worker <-> rabbitmq connection
 	// gets broken.  see https://github.com/tleyden/open-ocr/issues/4
 	for {
 		logg.LogTo("PREPROCESSOR_WORKER", "Creating new Preprocessor Worker")
-		preprocessorWorker, err := ocrworker.NewPreprocessorRpcWorker(rabbitConfig)
+		preprocessorWorker, err := ocrworker.NewPreprocessorRpcWorker(
+			rabbitConfig,
+			preprocessor,
+		)
 		if err != nil {
 			logg.LogPanic("Could not create rpc worker")
 		}
