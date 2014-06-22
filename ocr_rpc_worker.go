@@ -64,13 +64,17 @@ func (w OcrRpcWorker) Run() error {
 		return err
 	}
 
+	// just use the routing key as the queue name, since there's no reason
+	// to have a different name
+	queueName := w.rabbitConfig.RoutingKey
+
 	queue, err := w.channel.QueueDeclare(
-		w.rabbitConfig.QueueName, // name of the queue
-		true,  // durable
-		false, // delete when usused
-		false, // exclusive
-		false, // noWait
-		nil,   // arguments
+		queueName, // name of the queue
+		true,      // durable
+		false,     // delete when usused
+		false,     // exclusive
+		false,     // noWait
+		nil,       // arguments
 	)
 	if err != nil {
 		return err

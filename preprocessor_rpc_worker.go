@@ -63,19 +63,22 @@ func (w PreprocessorRpcWorker) Run() error {
 		return err
 	}
 
+	// just call the queue the same name as the binding key, since
+	// there is no reason to have a different name.
+	bindingKey := "stroke-width-transform"
+	queueName := bindingKey
+
 	queue, err := w.channel.QueueDeclare(
-		w.rabbitConfig.PreprocessorQueueName, // name of the queue
-		true,  // durable
-		false, // delete when usused
-		false, // exclusive
-		false, // noWait
-		nil,   // arguments
+		queueName, // name of the queue
+		true,      // durable
+		false,     // delete when usused
+		false,     // exclusive
+		false,     // noWait
+		nil,       // arguments
 	)
 	if err != nil {
 		return err
 	}
-
-	bindingKey := "stroke-width-transform"
 
 	if err = w.channel.QueueBind(
 		queue.Name,              // name of the queue

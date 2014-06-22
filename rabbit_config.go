@@ -5,13 +5,11 @@ import (
 )
 
 type RabbitConfig struct {
-	AmqpURI               string
-	Exchange              string
-	ExchangeType          string
-	RoutingKey            string
-	Reliable              bool
-	QueueName             string
-	PreprocessorQueueName string
+	AmqpURI      string
+	Exchange     string
+	ExchangeType string
+	RoutingKey   string
+	Reliable     bool
 }
 
 func DefaultTestConfig() RabbitConfig {
@@ -21,13 +19,11 @@ func DefaultTestConfig() RabbitConfig {
 	// higher would delay the problem, but then it would still happen later.
 
 	rabbitConfig := RabbitConfig{
-		AmqpURI:               "amqp://guest:guest@localhost:5672/",
-		Exchange:              "open-ocr-exchange3",
-		ExchangeType:          "direct",
-		RoutingKey:            "decode-ocr",
-		Reliable:              false, // setting to false because of observed issues
-		QueueName:             "open-ocr-queue",
-		PreprocessorQueueName: "preprocessor-queue",
+		AmqpURI:      "amqp://guest:guest@localhost:5672/",
+		Exchange:     "open-ocr-exchange",
+		ExchangeType: "direct",
+		RoutingKey:   "decode-ocr",
+		Reliable:     false, // setting to false because of observed issues
 	}
 	return rabbitConfig
 
