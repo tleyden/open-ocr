@@ -31,6 +31,28 @@ func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 	return ocrRpcClient, nil
 }
 
+func (c *OcrRpcClient) HandleOcrRequest(ocrReq OcrRequest) (OcrResult, error) {
+
+	var err error
+	downloadImgUrl := true
+	decodeResult := OcrResult{}
+
+	if downloadImgUrl == true {
+		imageBytes, err := url2bytes(ocrReq.ImgUrl)
+		if err != nil {
+			return decodeResult, err
+		}
+
+		decodeResult, err = c.DecodeImageBytes(imageBytes, ocrReq.EngineType)
+
+	} else {
+		decodeResult, err = c.DecodeImageUrl(ocrReq.ImgUrl, ocrReq.EngineType)
+	}
+
+	return decodeResult, err
+
+}
+
 func (c *OcrRpcClient) DecodeImageBytes(imgBytes []byte, eng OcrEngineType) (OcrResult, error) {
 
 	ocrRequest := OcrRequest{

@@ -39,22 +39,7 @@ func (s *OcrHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	downloadImgUrl := true
-	decodeResult := OcrResult{}
-
-	if downloadImgUrl == true {
-		imageBytes, err := url2bytes(ocrReq.ImgUrl)
-		if err != nil {
-			logg.LogError(err)
-			http.Error(w, "Unable to download OCR image", 500)
-			return
-		}
-
-		decodeResult, err = ocrClient.DecodeImageBytes(imageBytes, ocrReq.EngineType)
-
-	} else {
-		decodeResult, err = ocrClient.DecodeImageUrl(ocrReq.ImgUrl, ocrReq.EngineType)
-	}
+	decodeResult, err := ocrClient.HandleOcrRequest(ocrReq)
 
 	if err != nil {
 		logg.LogError(err)
