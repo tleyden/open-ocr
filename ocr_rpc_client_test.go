@@ -12,6 +12,7 @@ func init() {
 	logg.LogKeys["OCR"] = true
 	logg.LogKeys["OCR_CLIENT"] = true
 	logg.LogKeys["OCR_WORKER"] = true
+	logg.LogKeys["PREPROCESSOR_WORKER"] = true
 	logg.LogKeys["OCR_HTTP"] = true
 	logg.LogKeys["OCR_TESSERACT"] = true
 }

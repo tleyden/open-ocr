@@ -7,6 +7,7 @@ type OcrRequest struct {
 	EngineType        OcrEngineType `json:"engine"`
 	ImgBytes          []byte        `json:"img_bytes"`
 	PreprocessorChain []string      `json:"preprocessors"`
+	PreprocessorArgs  interface{}   `json:"preprocessor-args"`
 }
 
 // 		ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey),

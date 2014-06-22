@@ -1,6 +1,7 @@
 package ocrworker
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -8,6 +9,11 @@ import (
 
 	"github.com/couchbaselabs/logg"
 )
+
+type SwtOcrRequest struct {
+	OcrRequest
+	PreprocessorArgs []string `json:"preprocessor-args"`
+}
 
 type StrokeWidthTransformer struct {
 }
@@ -36,7 +42,7 @@ func (s StrokeWidthTransformer) preprocess(ocrRequest *OcrRequest) error {
 	}
 
 	// run DecodeText binary on it (if not in path, print warning and do nothing)
-	darkOnLightSetting := "1" // todo: this should be passed as a param.
+	darkOnLightSetting := s.extractDarkOnLightParam(*ocrRequest)
 	logg.LogTo(
 		"PREPROCESSOR_WORKER",
 		"DetectText on %s -> %s with %s",
@@ -64,5 +70,38 @@ func (s StrokeWidthTransformer) preprocess(ocrRequest *OcrRequest) error {
 	ocrRequest.ImgBytes = resultBytes
 
 	return nil
+
+}
+
+func (s StrokeWidthTransformer) extractDarkOnLightParam(ocrRequest OcrRequest) string {
+
+	logg.LogTo("PREPROCESSOR_WORKER", "extract dark on light param")
+
+	defaultVal := "1" // dark text on light background
+
+	ocrRequestJson, err := json.Marshal(ocrRequest)
+	if err != nil {
+		logg.LogTo("PREPROCESSOR_WORKER", "got error: %v", err)
+		logg.LogError(err)
+		return defaultVal
+	}
+
+	swtOcrRequest := SwtOcrRequest{}
+	err = json.Unmarshal(ocrRequestJson, &swtOcrRequest)
+	if err != nil {
+		logg.LogTo("PREPROCESSOR_WORKER", "got error: %v", err)
+		logg.LogError(err)
+		return defaultVal
+	}
+
+	if len(swtOcrRequest.PreprocessorArgs) > 0 {
+		val := swtOcrRequest.PreprocessorArgs[0]
+		logg.LogTo("PREPROCESSOR_WORKER", "dark on light param: %q", val)
+		return val
+	}
+
+	logg.LogTo("PREPROCESSOR_WORKER", "return default val")
+
+	return defaultVal
 
 }
