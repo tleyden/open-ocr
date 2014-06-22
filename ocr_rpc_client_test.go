@@ -1,9 +1,10 @@
 package ocrworker
 
 import (
+	"testing"
+
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
-	"testing"
 )
 
 func init() {
@@ -45,7 +46,8 @@ func TestOcrRpcClientIntegration(t *testing.T) {
 
 	for i := 0; i < 50; i++ {
 
-		decodeResult, err := ocrClient.DecodeImageUrl(testImageUrl, ENGINE_MOCK)
+		ocrRequest := OcrRequest{ImgUrl: testImageUrl, EngineType: ENGINE_MOCK}
+		decodeResult, err := ocrClient.DecodeImage(ocrRequest)
 		if err != nil {
 			logg.LogTo("TEST", "err: %v", err)
 		}

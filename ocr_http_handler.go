@@ -39,7 +39,7 @@ func (s *OcrHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	decodeResult, err := ocrClient.HandleOcrRequest(ocrReq)
+	decodeResult, err := ocrClient.DecodeImage(ocrReq)
 
 	if err != nil {
 		logg.LogError(err)

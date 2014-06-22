@@ -31,50 +31,7 @@ func NewOcrRpcClient(rc RabbitConfig) (*OcrRpcClient, error) {
 	return ocrRpcClient, nil
 }
 
-func (c *OcrRpcClient) HandleOcrRequest(ocrReq OcrRequest) (OcrResult, error) {
-
-	var err error
-	downloadImgUrl := true
-	decodeResult := OcrResult{}
-
-	if downloadImgUrl == true {
-		imageBytes, err := url2bytes(ocrReq.ImgUrl)
-		if err != nil {
-			return decodeResult, err
-		}
-
-		decodeResult, err = c.DecodeImageBytes(imageBytes, ocrReq.EngineType)
-
-	} else {
-		decodeResult, err = c.DecodeImageUrl(ocrReq.ImgUrl, ocrReq.EngineType)
-	}
-
-	return decodeResult, err
-
-}
-
-func (c *OcrRpcClient) DecodeImageBytes(imgBytes []byte, eng OcrEngineType) (OcrResult, error) {
-
-	ocrRequest := OcrRequest{
-		ImgBytes:   imgBytes,
-		EngineType: eng,
-	}
-	return c.DecodeImage(ocrRequest, eng)
-
-}
-
-func (c *OcrRpcClient) DecodeImageUrl(imgUrl string, eng OcrEngineType) (OcrResult, error) {
-
-	ocrRequest := OcrRequest{
-		ImgUrl:     imgUrl,
-		EngineType: eng,
-	}
-
-	return c.DecodeImage(ocrRequest, eng)
-
-}
-
-func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest, eng OcrEngineType) (OcrResult, error) {
+func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 	var err error
 
 	ocrRequestJson, err := json.Marshal(ocrRequest)
@@ -132,8 +89,8 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest, eng OcrEngineType) (Oc
 	}
 
 	if err = c.channel.Publish(
-		c.rabbitConfig.Exchange,   // publish to an exchange
-		c.rabbitConfig.RoutingKey, // routing to 0 or more queues
+		c.rabbitConfig.Exchange, // publish to an exchange
+		ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey),
 		false, // mandatory
 		false, // immediate
 		amqp.Publishing{
