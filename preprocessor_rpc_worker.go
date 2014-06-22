@@ -64,7 +64,7 @@ func (w PreprocessorRpcWorker) Run() error {
 	}
 
 	queue, err := w.channel.QueueDeclare(
-		w.rabbitConfig.QueueName, // name of the queue
+		w.rabbitConfig.PreprocessorQueueName, // name of the queue
 		true,  // durable
 		false, // delete when usused
 		false, // exclusive
@@ -126,9 +126,10 @@ func (w *PreprocessorRpcWorker) handle(deliveries <-chan amqp.Delivery, done cha
 	for d := range deliveries {
 		logg.LogTo(
 			"PREPROCESSOR_WORKER",
-			"got %d byte delivery: [%v].  Reply to: %v",
+			"got %d byte delivery: [%v]. Routing key: %s Reply to: %v",
 			len(d.Body),
 			d.DeliveryTag,
+			d.RoutingKey,
 			d.ReplyTo,
 		)
 

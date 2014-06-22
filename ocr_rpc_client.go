@@ -83,6 +83,11 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 		defer confirmDelivery(ack, nack)
 	}
 
+	err = ocrRequest.downloadImgUrl()
+	if err != nil {
+		return OcrResult{}, err
+	}
+
 	logg.LogTo("OCR_CLIENT", "ocrRequest before: %v", ocrRequest)
 	routingKey := ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey)
 	logg.LogTo("OCR_CLIENT", "publishing with routing key %q", routingKey)

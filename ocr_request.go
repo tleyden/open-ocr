@@ -1,5 +1,7 @@
 package ocrworker
 
+import "fmt"
+
 type OcrRequest struct {
 	ImgUrl            string        `json:"img_url"`
 	EngineType        OcrEngineType `json:"engine"`
@@ -22,4 +24,19 @@ func (ocrRequest *OcrRequest) nextPreprocessor(processorRoutingKey string) strin
 		return x
 	}
 
+}
+
+func (ocrRequest *OcrRequest) downloadImgUrl() error {
+
+	bytes, err := url2bytes(ocrRequest.ImgUrl)
+	if err != nil {
+		return err
+	}
+	ocrRequest.ImgBytes = bytes
+	ocrRequest.ImgUrl = ""
+	return nil
+}
+
+func (o OcrRequest) String() string {
+	return fmt.Sprintf("ImgUrl: %s, EngineType: %s, Preprocessors: %s", o.ImgUrl, o.EngineType, o.PreprocessorChain)
 }
