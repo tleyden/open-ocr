@@ -80,6 +80,7 @@ You can also run OpenOCR on any PAAS that supports Docker containers.  Here are 
 
 * [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
 * [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
+* [Tutum](https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum)
 * More coming soon ..
 
 # Community
