@@ -10,8 +10,6 @@ type OcrRequest struct {
 	PreprocessorArgs  map[string]interface{} `json:"preprocessor-args"`
 }
 
-// 		ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey),
-
 // figure out the next pre-processor routing key to use (if any).
 // if we have finished with the pre-processors, then use the processorRoutingKey
 func (ocrRequest *OcrRequest) nextPreprocessor(processorRoutingKey string) string {
