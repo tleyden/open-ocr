@@ -174,13 +174,7 @@ func (w *OcrRpcWorker) resultForDelivery(d amqp.Delivery) (OcrResult, error) {
 
 	ocrEngine := NewOcrEngine(ocrRequest.EngineType)
 
-	if ocrRequest.ImgUrl != "" {
-		logg.LogTo("OCR_WORKER", "Decoding image url: %v with engine: %v", ocrRequest.ImgUrl, ocrRequest.EngineType)
-		ocrResult, err = ocrEngine.ProcessImageUrl(ocrRequest.ImgUrl)
-	} else {
-		logg.LogTo("OCR_WORKER", "Decoding image bytes with engine: %v", ocrRequest.EngineType)
-		ocrResult, err = ocrEngine.ProcessImageBytes(ocrRequest.ImgBytes)
-	}
+	ocrResult, err = ocrEngine.ProcessRequest(ocrRequest)
 
 	if err != nil {
 		msg := "Error processing image url: %v.  Error: %v"
