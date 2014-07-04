@@ -83,6 +83,10 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 		defer confirmDelivery(ack, nack)
 	}
 
+	// TODO: we only need to download image url if there are
+	// any preprocessors.  if rabbitmq isn't in same data center
+	// as open-ocr, it will be expensive in terms of bandwidth
+	// to have image binary in messages
 	err = ocrRequest.downloadImgUrl()
 	if err != nil {
 		return OcrResult{}, err
