@@ -15,8 +15,7 @@ const (
 )
 
 type OcrEngine interface {
-	ProcessImageUrl(imgUrl string) (OcrResult, error)
-	ProcessImageBytes(imgBytes []byte) (OcrResult, error)
+	ProcessRequest(ocrRequest OcrRequest) (OcrResult, error)
 }
 
 func NewOcrEngine(engineType OcrEngineType) OcrEngine {
