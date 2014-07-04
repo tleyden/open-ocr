@@ -9,6 +9,23 @@ import (
 	"github.com/couchbaselabs/logg"
 )
 
+func TestTesseractEngineExecWithRequest(t *testing.T) {
+
+	engine := TesseractEngineExec{}
+	bytes, err := ioutil.ReadFile("docs/testimage.png")
+
+	ocrRequest := OcrRequest{
+		ImgBytes:   bytes,
+		EngineType: ENGINE_TESSERACT_EXEC,
+	}
+
+	assert.True(t, err == nil)
+	result, err := engine.ProcessRequest(ocrRequest)
+	assert.True(t, err == nil)
+	logg.LogTo("TEST", "result: %v", result)
+
+}
+
 func TestTesseractEngineExecWithFile(t *testing.T) {
 
 	engine := TesseractEngineExec{}

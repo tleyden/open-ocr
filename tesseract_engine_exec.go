@@ -1,6 +1,7 @@
 package ocrworker
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,7 +17,18 @@ type TesseractEngineExec struct {
 }
 
 func (t TesseractEngineExec) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error) {
-	return OcrResult{}, nil
+
+	ocrResult := OcrResult{Text: "Error"}
+	err := errors.New("")
+
+	if ocrRequest.ImgUrl != "" {
+		ocrResult, err = t.ProcessImageUrl(ocrRequest.ImgUrl)
+	} else {
+		ocrResult, err = t.ProcessImageBytes(ocrRequest.ImgBytes)
+	}
+
+	return ocrResult, err
+
 }
 
 func (t TesseractEngineExec) ProcessImageBytes(imgBytes []byte) (OcrResult, error) {
