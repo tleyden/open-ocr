@@ -113,8 +113,8 @@ func (t TesseractEngineExec) processImageFile(inputFilename string) (OcrResult, 
 	cmdArgs = append(cmdArgs, cflags...)
 	logg.LogTo("OCR_TESSERACT", "cmdArgs: %v", cmdArgs)
 
-	// cmd := exec.Command("tesseract", cmdArgs...)
-	cmd := exec.Command("tesseract", inputFilename, tmpOutFileBaseName, "-c", "tessedit_char_whitelist=0123456789")
+	cmd := exec.Command("tesseract", cmdArgs...)
+	// cmd := exec.Command("tesseract", inputFilename, tmpOutFileBaseName, "-c", "tessedit_char_whitelist=0123456789")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		logg.LogTo("OCR_TESSERACT", "Error exec tesseract: %v %v", err, string(output))
