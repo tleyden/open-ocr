@@ -16,6 +16,26 @@ import (
 type TesseractEngineExec struct {
 }
 
+/*
+Json:
+
+"args":{
+  "cFlags":{
+    "tessedit_char_whitelist":"0123456789"
+  }
+}
+
+*/
+type TesseractEngineExecArgs struct {
+	cFlags map[string]string
+}
+
+// return a slice that can be passed to tesseract binary as command line
+// args, eg, ["-c", "tessedit_char_whitelist=0123456789", "-c", "foo=bar"]
+func (t TesseractEngineExecArgs) ExportCFlags() []string {
+	return []string{"-c", "tessedit_char_whitelist=0123456789"}
+}
+
 func (t TesseractEngineExec) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error) {
 
 	ocrResult := OcrResult{Text: "Error"}
@@ -86,7 +106,15 @@ func (t TesseractEngineExec) processImageFile(inputFilename string) (OcrResult, 
 	defer os.Remove(tmpOutFileName)
 
 	// exec tesseract
-	cmd := exec.Command("tesseract", inputFilename, tmpOutFileBaseName)
+	args := TesseractEngineExecArgs{}
+	cflags := args.ExportCFlags()
+
+	cmdArgs := []string{inputFilename, tmpOutFileBaseName}
+	cmdArgs = append(cmdArgs, cflags...)
+	logg.LogTo("OCR_TESSERACT", "cmdArgs: %v", cmdArgs)
+
+	// cmd := exec.Command("tesseract", cmdArgs...)
+	cmd := exec.Command("tesseract", inputFilename, tmpOutFileBaseName, "-c", "tessedit_char_whitelist=0123456789")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		logg.LogTo("OCR_TESSERACT", "Error exec tesseract: %v %v", err, string(output))
