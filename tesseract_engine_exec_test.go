@@ -14,9 +14,16 @@ func TestTesseractEngineExecWithRequest(t *testing.T) {
 	engine := TesseractEngineExec{}
 	bytes, err := ioutil.ReadFile("docs/testimage.png")
 
+	cFlags := make(map[string]string)
+	cFlags["tessedit_char_whitelist"] = "0123456789"
+	engineArgs := TesseractEngineExecArgs{
+		cFlags: cFlags,
+	}
+
 	ocrRequest := OcrRequest{
 		ImgBytes:   bytes,
 		EngineType: ENGINE_TESSERACT_EXEC,
+		EngineArgs: engineArgs,
 	}
 
 	assert.True(t, err == nil)
@@ -29,18 +36,8 @@ func TestTesseractEngineExecWithRequest(t *testing.T) {
 func TestTesseractEngineExecWithFile(t *testing.T) {
 
 	engine := TesseractEngineExec{}
-	result, err := engine.processImageFile("docs/testimage.png")
-	assert.True(t, err == nil)
-	logg.LogTo("TEST", "result: %v", result)
-
-}
-
-func TestTesseractEngineExecWithBytes(t *testing.T) {
-
-	engine := TesseractEngineExec{}
-	bytes, err := ioutil.ReadFile("docs/testimage.png")
-	assert.True(t, err == nil)
-	result, err := engine.ProcessImageBytes(bytes)
+	engineArgs := TesseractEngineExecArgs{}
+	result, err := engine.processImageFile("docs/testimage.png", engineArgs)
 	assert.True(t, err == nil)
 	logg.LogTo("TEST", "result: %v", result)
 
