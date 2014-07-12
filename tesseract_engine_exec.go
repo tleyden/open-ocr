@@ -1,7 +1,6 @@
 package ocrworker
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -33,64 +32,77 @@ type TesseractEngineExecArgs struct {
 // return a slice that can be passed to tesseract binary as command line
 // args, eg, ["-c", "tessedit_char_whitelist=0123456789", "-c", "foo=bar"]
 func (t TesseractEngineExecArgs) ExportCFlags() []string {
-	return []string{"-c", "tessedit_char_whitelist=0123456789"}
+	result := []string{}
+	for k, v := range t.cFlags {
+		result = append(result, "-c")
+		keyValArg := fmt.Sprintf("%s=%s", k, v)
+		result = append(result, keyValArg)
+	}
+	return result
 }
 
 func (t TesseractEngineExec) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error) {
 
-	ocrResult := OcrResult{Text: "Error"}
-	err := errors.New("")
+	engineArgs := ocrRequest.EngineArgs.(TesseractEngineExecArgs)
+	cFlags := engineArgs.ExportCFlags()
+	logg.LogTo("OCR_TESSERACT", "cFlags: %v", cFlags)
 
-	if ocrRequest.ImgUrl != "" {
-		ocrResult, err = t.ProcessImageUrl(ocrRequest.ImgUrl)
-	} else {
-		ocrResult, err = t.ProcessImageBytes(ocrRequest.ImgBytes)
+	tmpFileName, err := func() (string, error) {
+		if ocrRequest.ImgUrl != "" {
+			return t.tmpFileFromImageUrl(ocrRequest.ImgUrl)
+		} else {
+			return t.tmpFileFromImageBytes(ocrRequest.ImgBytes)
+		}
+
+	}()
+
+	if err != nil {
+		return OcrResult{}, err
 	}
+
+	defer os.Remove(tmpFileName)
+	ocrResult, err := t.processImageFile(tmpFileName, engineArgs)
 
 	return ocrResult, err
 
 }
 
-func (t TesseractEngineExec) ProcessImageBytes(imgBytes []byte) (OcrResult, error) {
+func (t TesseractEngineExec) tmpFileFromImageBytes(imgBytes []byte) (string, error) {
 
 	tmpFileName, err := createTempFileName()
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
-	defer os.Remove(tmpFileName)
 
 	// we have to write the contents of the image url to a temp
 	// file, because the leptonica lib can't seem to handle byte arrays
 	err = saveBytesToFileName(imgBytes, tmpFileName)
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
 
-	return t.processImageFile(tmpFileName)
+	return tmpFileName, nil
 
 }
 
-func (t TesseractEngineExec) ProcessImageUrl(imgUrl string) (OcrResult, error) {
-
-	logg.LogTo("OCR_TESSERACT", "ProcessImageUrl()")
+func (t TesseractEngineExec) tmpFileFromImageUrl(imgUrl string) (string, error) {
 
 	tmpFileName, err := createTempFileName()
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
-	defer os.Remove(tmpFileName)
 	// we have to write the contents of the image url to a temp
 	// file, because the leptonica lib can't seem to handle byte arrays
 	err = saveUrlContentToFileName(imgUrl, tmpFileName)
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
 
-	return t.processImageFile(tmpFileName)
+	return tmpFileName, nil
 
 }
 
-func (t TesseractEngineExec) processImageFile(inputFilename string) (OcrResult, error) {
+func (t TesseractEngineExec) processImageFile(inputFilename string, engineArgs TesseractEngineExecArgs) (OcrResult, error) {
 
 	// give tesseract a unique output filename
 	tmpOutFileBaseName, err := createTempFileName()
@@ -105,16 +117,14 @@ func (t TesseractEngineExec) processImageFile(inputFilename string) (OcrResult, 
 	// delete output file when we are done
 	defer os.Remove(tmpOutFileName)
 
-	// exec tesseract
-	args := TesseractEngineExecArgs{}
-	cflags := args.ExportCFlags()
-
+	// build args array
+	cflags := engineArgs.ExportCFlags()
 	cmdArgs := []string{inputFilename, tmpOutFileBaseName}
 	cmdArgs = append(cmdArgs, cflags...)
 	logg.LogTo("OCR_TESSERACT", "cmdArgs: %v", cmdArgs)
 
+	// exec tesseract
 	cmd := exec.Command("tesseract", cmdArgs...)
-	// cmd := exec.Command("tesseract", inputFilename, tmpOutFileBaseName, "-c", "tessedit_char_whitelist=0123456789")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		logg.LogTo("OCR_TESSERACT", "Error exec tesseract: %v %v", err, string(output))
