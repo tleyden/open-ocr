@@ -16,29 +16,29 @@ type TesseractEngineExec struct {
 }
 
 type TesseractEngineExecArgs struct {
-	cFlags map[string]string `json:"config_vars"`
+	configVars map[string]string `json:"config_vars"`
 }
 
 func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs, error) {
 
-	cFlagsMapInterfaceOrig := ocrRequest.EngineArgs["config_vars"]
+	configVarsMapInterfaceOrig := ocrRequest.EngineArgs["config_vars"]
 
-	logg.LogTo("OCR_TESSERACT", "got cFlagsMap: %v type: %T", cFlagsMapInterfaceOrig, cFlagsMapInterfaceOrig)
+	logg.LogTo("OCR_TESSERACT", "got configVarsMap: %v type: %T", configVarsMapInterfaceOrig, configVarsMapInterfaceOrig)
 
-	cFlagsMapInterface := cFlagsMapInterfaceOrig.(map[string]interface{})
+	configVarsMapInterface := configVarsMapInterfaceOrig.(map[string]interface{})
 
-	cFlagsMap := make(map[string]string)
-	for k, v := range cFlagsMapInterface {
+	configVarsMap := make(map[string]string)
+	for k, v := range configVarsMapInterface {
 		v, ok := v.(string)
 		if !ok {
 			return nil, fmt.Errorf("Could not convert v into string: %v", v)
 		}
-		cFlagsMap[k] = v
+		configVarsMap[k] = v
 	}
 
-	logg.LogTo("OCR_TESSERACT", "got cFlagsMap: %v type: %T", cFlagsMap, cFlagsMap)
+	logg.LogTo("OCR_TESSERACT", "got configVarsMap: %v type: %T", configVarsMap, configVarsMap)
 	engineArgs := &TesseractEngineExecArgs{
-		cFlags: cFlagsMap,
+		configVars: configVarsMap,
 	}
 	return engineArgs, nil
 
@@ -48,7 +48,7 @@ func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs
 // args, eg, ["-c", "tessedit_char_whitelist=0123456789", "-c", "foo=bar"]
 func (t TesseractEngineExecArgs) ExportCFlags() []string {
 	result := []string{}
-	for k, v := range t.cFlags {
+	for k, v := range t.configVars {
 		result = append(result, "-c")
 		keyValArg := fmt.Sprintf("%s=%s", k, v)
 		result = append(result, keyValArg)
