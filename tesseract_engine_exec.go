@@ -29,9 +29,29 @@ type TesseractEngineExecArgs struct {
 	cFlags map[string]string `json:"c_flags"`
 }
 
-/*func NewTesseractEngineExecArgs(ocrRequest OcrRequest) *TesseractEngineExecArgs {
+func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs, error) {
+	cFlagsMapInterfaceOrig := ocrRequest.EngineArgs["c_flags"]
 
-}*/
+	logg.LogTo("OCR_TESSERACT", "got cFlagsMap: %v type: %T", cFlagsMapInterfaceOrig, cFlagsMapInterfaceOrig)
+
+	cFlagsMapInterface := cFlagsMapInterfaceOrig.(map[string]interface{})
+
+	cFlagsMap := make(map[string]string)
+	for k, v := range cFlagsMapInterface {
+		v, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("Could not convert v into string: %v", v)
+		}
+		cFlagsMap[k] = v
+	}
+
+	logg.LogTo("OCR_TESSERACT", "got cFlagsMap: %v type: %T", cFlagsMap, cFlagsMap)
+	engineArgs := &TesseractEngineExecArgs{
+		cFlags: cFlagsMap,
+	}
+	return engineArgs, nil
+
+}
 
 // return a slice that can be passed to tesseract binary as command line
 // args, eg, ["-c", "tessedit_char_whitelist=0123456789", "-c", "foo=bar"]
@@ -46,26 +66,6 @@ func (t TesseractEngineExecArgs) ExportCFlags() []string {
 }
 
 func (t TesseractEngineExec) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error) {
-
-	cFlagsMapInterfaceOrig := ocrRequest.EngineArgs["c_flags"]
-
-	logg.LogTo("OCR_TESSERACT", "got cFlagsMap: %v type: %T", cFlagsMapInterfaceOrig, cFlagsMapInterfaceOrig)
-
-	cFlagsMapInterface := cFlagsMapInterfaceOrig.(map[string]interface{})
-
-	cFlagsMap := make(map[string]string)
-	for k, v := range cFlagsMapInterface {
-		v, ok := v.(string)
-		if !ok {
-			return OcrResult{}, fmt.Errorf("invalid cflag")
-		}
-		cFlagsMap[k] = v
-	}
-
-	logg.LogTo("OCR_TESSERACT", "got cFlagsMap: %v type: %T", cFlagsMap, cFlagsMap)
-	engineArgs := TesseractEngineExecArgs{
-		cFlags: cFlagsMap,
-	}
 
 	tmpFileName, err := func() (string, error) {
 		if ocrRequest.ImgUrl != "" {
@@ -82,7 +82,14 @@ func (t TesseractEngineExec) ProcessRequest(ocrRequest OcrRequest) (OcrResult, e
 	}
 
 	defer os.Remove(tmpFileName)
-	ocrResult, err := t.processImageFile(tmpFileName, engineArgs)
+
+	engineArgs, err := NewTesseractEngineExecArgs(ocrRequest)
+	if err != nil {
+		logg.LogTo("OCR_TESSERACT", "error getting engineArgs")
+		return OcrResult{}, err
+	}
+
+	ocrResult, err := t.processImageFile(tmpFileName, *engineArgs)
 
 	return ocrResult, err
 
