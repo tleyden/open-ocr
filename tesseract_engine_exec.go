@@ -15,22 +15,13 @@ import (
 type TesseractEngineExec struct {
 }
 
-/*
-Json:
-
-"args":{
-  "cFlags":{
-    "tessedit_char_whitelist":"0123456789"
-  }
-}
-
-*/
 type TesseractEngineExecArgs struct {
-	cFlags map[string]string `json:"c_flags"`
+	cFlags map[string]string `json:"config_vars"`
 }
 
 func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs, error) {
-	cFlagsMapInterfaceOrig := ocrRequest.EngineArgs["c_flags"]
+
+	cFlagsMapInterfaceOrig := ocrRequest.EngineArgs["config_vars"]
 
 	logg.LogTo("OCR_TESSERACT", "got cFlagsMap: %v type: %T", cFlagsMapInterfaceOrig, cFlagsMapInterfaceOrig)
 

@@ -34,7 +34,7 @@ func TestTesseractEngineExecWithRequest(t *testing.T) {
 
 func TestTesseractEngineExecWithJson(t *testing.T) {
 
-	testJson := `{"engine":"tesseract_exec", "engine_args":{"c_flags":{"tessedit_char_whitelist":"0123456789"}}}`
+	testJson := `{"engine":"tesseract_exec", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}}}`
 	ocrRequest := OcrRequest{}
 	err := json.Unmarshal([]byte(testJson), &ocrRequest)
 	assert.True(t, err == nil)
