@@ -12,7 +12,7 @@ type OcrRequest struct {
 	// TODO: need a way to have it generic here, but able to convert
 	// into a TesseractEngineExec struct that is specific to TesserectExec
 
-	EngineArgs interface{} `json:"engine_args"`
+	EngineArgs map[string]interface{} `json:"engine_args"`
 }
 
 // figure out the next pre-processor routing key to use (if any).
