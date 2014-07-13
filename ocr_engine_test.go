@@ -2,9 +2,10 @@ package ocrworker
 
 import (
 	"encoding/json"
+	"testing"
+
 	"github.com/couchbaselabs/go.assert"
 	"github.com/couchbaselabs/logg"
-	"testing"
 )
 
 func TestOcrEngineTypeJson(t *testing.T) {

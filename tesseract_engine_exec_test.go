@@ -1,6 +1,7 @@
 package ocrworker
 
 import (
+	"encoding/json"
 	"testing"
 
 	"io/ioutil"
@@ -13,21 +14,36 @@ func TestTesseractEngineExecWithRequest(t *testing.T) {
 
 	engine := TesseractEngineExec{}
 	bytes, err := ioutil.ReadFile("docs/testimage.png")
+	assert.True(t, err == nil)
 
-	cFlags := make(map[string]string)
+	cFlags := make(map[string]interface{})
 	cFlags["tessedit_char_whitelist"] = "0123456789"
-	engineArgs := TesseractEngineExecArgs{
-		cFlags: cFlags,
-	}
 
 	ocrRequest := OcrRequest{
 		ImgBytes:   bytes,
 		EngineType: ENGINE_TESSERACT_EXEC,
-		EngineArgs: engineArgs,
+		EngineArgs: cFlags,
 	}
 
 	assert.True(t, err == nil)
 	result, err := engine.ProcessRequest(ocrRequest)
+	assert.True(t, err == nil)
+	logg.LogTo("TEST", "result: %v", result)
+
+}
+
+func TestTesseractEngineExecWithJson(t *testing.T) {
+
+	testJson := `{"engine":"tesseract_exec", "engine_args":{"c_flags":{"tessedit_char_whitelist":"0123456789"}}}`
+	ocrRequest := OcrRequest{}
+	err := json.Unmarshal([]byte(testJson), &ocrRequest)
+	assert.True(t, err == nil)
+	bytes, err := ioutil.ReadFile("docs/testimage.png")
+	assert.True(t, err == nil)
+	ocrRequest.ImgBytes = bytes
+	engine := NewOcrEngine(ocrRequest.EngineType)
+	result, err := engine.ProcessRequest(ocrRequest)
+	logg.LogTo("TEST", "err: %v", err)
 	assert.True(t, err == nil)
 	logg.LogTo("TEST", "result: %v", result)
 
