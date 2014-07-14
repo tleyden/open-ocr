@@ -11,16 +11,18 @@ import (
 
 // This variant of the TesseractEngine calls tesseract via exec rather
 // than go.tesseract.
-// TODO: update dockerfile to install go-tesseract package!
+// TODO: update dockerfile to install tesseract command line package!
 type TesseractEngineExec struct {
 }
 
 type TesseractEngineExecArgs struct {
-	configVars map[string]string `json:"config_vars"`
+	configVars  map[string]string `json:"config_vars"`
+	pageSegMode string            `json:"psm"`
 }
 
 func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs, error) {
 
+	// config vars
 	configVarsMapInterfaceOrig := ocrRequest.EngineArgs["config_vars"]
 
 	logg.LogTo("OCR_TESSERACT", "got configVarsMap: %v type: %T", configVarsMapInterfaceOrig, configVarsMapInterfaceOrig)
@@ -31,14 +33,23 @@ func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs
 	for k, v := range configVarsMapInterface {
 		v, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("Could not convert v into string: %v", v)
+			return nil, fmt.Errorf("Could not convert configVar into string: %v", v)
 		}
 		configVarsMap[k] = v
 	}
 
-	logg.LogTo("OCR_TESSERACT", "got configVarsMap: %v type: %T", configVarsMap, configVarsMap)
 	engineArgs := &TesseractEngineExecArgs{
 		configVars: configVarsMap,
+	}
+
+	// page seg mode
+	pageSegMode := ocrRequest.EngineArgs["psm"]
+	if pageSegMode != nil {
+		pageSegModeStr, ok := pageSegMode.(string)
+		if !ok {
+			return nil, fmt.Errorf("Could not convert psm into string: %v", pageSegMode)
+		}
+		engineArgs.pageSegMode = pageSegModeStr
 	}
 	return engineArgs, nil
 
@@ -46,12 +57,16 @@ func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs
 
 // return a slice that can be passed to tesseract binary as command line
 // args, eg, ["-c", "tessedit_char_whitelist=0123456789", "-c", "foo=bar"]
-func (t TesseractEngineExecArgs) ExportCFlags() []string {
+func (t TesseractEngineExecArgs) Export() []string {
 	result := []string{}
 	for k, v := range t.configVars {
 		result = append(result, "-c")
 		keyValArg := fmt.Sprintf("%s=%s", k, v)
 		result = append(result, keyValArg)
+	}
+	if t.pageSegMode != "" {
+		result = append(result, "-psm")
+		result = append(result, t.pageSegMode)
 	}
 	return result
 }
@@ -137,7 +152,7 @@ func (t TesseractEngineExec) processImageFile(inputFilename string, engineArgs T
 	defer os.Remove(tmpOutFileName)
 
 	// build args array
-	cflags := engineArgs.ExportCFlags()
+	cflags := engineArgs.Export()
 	cmdArgs := []string{inputFilename, tmpOutFileBaseName}
 	cmdArgs = append(cmdArgs, cflags...)
 	logg.LogTo("OCR_TESSERACT", "cmdArgs: %v", cmdArgs)

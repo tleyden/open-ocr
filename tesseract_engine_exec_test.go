@@ -34,7 +34,7 @@ func TestTesseractEngineExecWithRequest(t *testing.T) {
 
 func TestTesseractEngineExecWithJson(t *testing.T) {
 
-	testJson := `{"engine":"tesseract_exec", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}}}`
+	testJson := `{"engine":"tesseract_exec", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}, "psm":"0"}}`
 	ocrRequest := OcrRequest{}
 	err := json.Unmarshal([]byte(testJson), &ocrRequest)
 	assert.True(t, err == nil)
@@ -46,6 +46,19 @@ func TestTesseractEngineExecWithJson(t *testing.T) {
 	logg.LogTo("TEST", "err: %v", err)
 	assert.True(t, err == nil)
 	logg.LogTo("TEST", "result: %v", result)
+
+}
+
+func TestNewTesseractEngineExecArgs(t *testing.T) {
+	testJson := `{"engine":"tesseract_exec", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}, "psm":"0"}}`
+	ocrRequest := OcrRequest{}
+	err := json.Unmarshal([]byte(testJson), &ocrRequest)
+	assert.True(t, err == nil)
+	engineArgs, err := NewTesseractEngineExecArgs(ocrRequest)
+	assert.True(t, err == nil)
+	assert.Equals(t, len(engineArgs.configVars), 1)
+	assert.Equals(t, engineArgs.configVars["tessedit_char_whitelist"], "0123456789")
+	assert.Equals(t, engineArgs.pageSegMode, "0")
 
 }
 
