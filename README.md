@@ -12,6 +12,8 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 * Scalable message passing architecture
 * Platform independence via Docker containers
 * Improved accuracy via [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) image preprocessing.
+* Pass arguments to Tesseract such as character whitelist and page segment mode
+* [REST API docs](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html)
 
 # Launching OpenOCR on Ubuntu 14.04
 
@@ -73,6 +75,8 @@ composed of alphanumeric characters and the underscore. In the example
 below I have used a few variations that work for variable names.
 
 ```
+
+To see other parameters that you can pass in the request, see the [REST API docs](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html)
 
 # Launching OpenOCR on a Docker PAAS
 
