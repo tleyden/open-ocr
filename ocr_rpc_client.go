@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	RPC_RESPONSE_TIMEOUT = time.Second * 30
+	RPC_RESPONSE_TIMEOUT = time.Second * 120
 )
 
 type OcrRpcClient struct {
