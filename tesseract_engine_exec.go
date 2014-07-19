@@ -146,15 +146,12 @@ func (t TesseractEngineExec) tmpFileFromImageUrl(imgUrl string) (string, error) 
 
 func (t TesseractEngineExec) processImageFile(inputFilename string, engineArgs TesseractEngineExecArgs) (OcrResult, error) {
 
-	// give tesseract a unique output filename
-	tmpOutFileBaseName, err := createTempFileName()
-	if err != nil {
-		logg.LogTo("OCR_TESSERACT", "Error creating tmp file: %v", err)
-		return OcrResult{}, err
-	}
+	// if the input filename is /tmp/ocrimage, set the output file basename
+	// to /tmp/ocrimage as well, which will produce /tmp/ocrimage.txt output
+	tmpOutFileBaseName := inputFilename
 
 	// the actual file it writes to will have a .txt extension
-	tmpOutFileName := fmt.Sprintf("%s.txt", tmpOutFileBaseName)
+	tmpOutFileName := fmt.Sprintf("%s.txt", inputFilename)
 
 	// delete output file when we are done
 	defer os.Remove(tmpOutFileName)
