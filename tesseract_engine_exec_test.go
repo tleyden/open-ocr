@@ -34,18 +34,27 @@ func TestTesseractEngineExecWithRequest(t *testing.T) {
 
 func TestTesseractEngineExecWithJson(t *testing.T) {
 
-	testJson := `{"engine":"tesseract_exec", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}, "psm":"0"}}`
-	ocrRequest := OcrRequest{}
-	err := json.Unmarshal([]byte(testJson), &ocrRequest)
-	assert.True(t, err == nil)
-	bytes, err := ioutil.ReadFile("docs/testimage.png")
-	assert.True(t, err == nil)
-	ocrRequest.ImgBytes = bytes
-	engine := NewOcrEngine(ocrRequest.EngineType)
-	result, err := engine.ProcessRequest(ocrRequest)
-	logg.LogTo("TEST", "err: %v", err)
-	assert.True(t, err == nil)
-	logg.LogTo("TEST", "result: %v", result)
+	testJsons := []string{}
+	testJsons = append(testJsons, `{"engine":"tesseract_exec"}`)
+	testJsons = append(testJsons, `{"engine":"tesseract_exec", "engine_args":{}}`)
+	testJsons = append(testJsons, `{"engine":"tesseract_exec", "engine_args":null}`)
+	testJsons = append(testJsons, `{"engine":"tesseract_exec", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}, "psm":"0"}}`)
+
+	for _, testJson := range testJsons {
+		logg.LogTo("TEST", "testJson: %v", testJson)
+		ocrRequest := OcrRequest{}
+		err := json.Unmarshal([]byte(testJson), &ocrRequest)
+		assert.True(t, err == nil)
+		bytes, err := ioutil.ReadFile("docs/testimage.png")
+		assert.True(t, err == nil)
+		ocrRequest.ImgBytes = bytes
+		engine := NewOcrEngine(ocrRequest.EngineType)
+		result, err := engine.ProcessRequest(ocrRequest)
+		logg.LogTo("TEST", "err: %v", err)
+		assert.True(t, err == nil)
+		logg.LogTo("TEST", "result: %v", result)
+
+	}
 
 }
 

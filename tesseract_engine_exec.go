@@ -22,24 +22,32 @@ type TesseractEngineExecArgs struct {
 
 func NewTesseractEngineExecArgs(ocrRequest OcrRequest) (*TesseractEngineExecArgs, error) {
 
+	engineArgs := &TesseractEngineExecArgs{}
+
+	if ocrRequest.EngineArgs == nil {
+		return engineArgs, nil
+	}
+
 	// config vars
 	configVarsMapInterfaceOrig := ocrRequest.EngineArgs["config_vars"]
 
-	logg.LogTo("OCR_TESSERACT", "got configVarsMap: %v type: %T", configVarsMapInterfaceOrig, configVarsMapInterfaceOrig)
+	if configVarsMapInterfaceOrig != nil {
 
-	configVarsMapInterface := configVarsMapInterfaceOrig.(map[string]interface{})
+		logg.LogTo("OCR_TESSERACT", "got configVarsMap: %v type: %T", configVarsMapInterfaceOrig, configVarsMapInterfaceOrig)
 
-	configVarsMap := make(map[string]string)
-	for k, v := range configVarsMapInterface {
-		v, ok := v.(string)
-		if !ok {
-			return nil, fmt.Errorf("Could not convert configVar into string: %v", v)
+		configVarsMapInterface := configVarsMapInterfaceOrig.(map[string]interface{})
+
+		configVarsMap := make(map[string]string)
+		for k, v := range configVarsMapInterface {
+			v, ok := v.(string)
+			if !ok {
+				return nil, fmt.Errorf("Could not convert configVar into string: %v", v)
+			}
+			configVarsMap[k] = v
 		}
-		configVarsMap[k] = v
-	}
 
-	engineArgs := &TesseractEngineExecArgs{
-		configVars: configVarsMap,
+		engineArgs.configVars = configVarsMap
+
 	}
 
 	// page seg mode
