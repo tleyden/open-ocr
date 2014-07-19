@@ -11,7 +11,7 @@ type OcrEngineType int
 
 const (
 	ENGINE_TESSERACT = OcrEngineType(iota)
-	ENGINE_TESSERACT_EXEC
+	ENGINE_GO_TESSERACT
 	ENGINE_MOCK
 )
 
@@ -25,8 +25,8 @@ func NewOcrEngine(engineType OcrEngineType) OcrEngine {
 		return &MockEngine{}
 	case ENGINE_TESSERACT:
 		return &TesseractEngine{}
-	case ENGINE_TESSERACT_EXEC:
-		return &TesseractEngineExec{}
+	case ENGINE_GO_TESSERACT:
+		return &GoTesseractEngine{}
 
 	}
 	return nil
@@ -38,8 +38,8 @@ func (e OcrEngineType) String() string {
 		return "ENGINE_MOCK"
 	case ENGINE_TESSERACT:
 		return "ENGINE_TESSERACT"
-	case ENGINE_TESSERACT_EXEC:
-		return "ENGINE_TESSERACT_EXEC"
+	case ENGINE_GO_TESSERACT:
+		return "ENGINE_GO_TESSERACT"
 
 	}
 	return ""
@@ -54,8 +54,8 @@ func (e *OcrEngineType) UnmarshalJSON(b []byte) (err error) {
 		switch engineString {
 		case "TESSERACT":
 			*e = ENGINE_TESSERACT
-		case "TESSERACT_EXEC":
-			*e = ENGINE_TESSERACT_EXEC
+		case "GO_TESSERACT":
+			*e = ENGINE_GO_TESSERACT
 		case "MOCK":
 			*e = ENGINE_MOCK
 		default:

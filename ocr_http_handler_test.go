@@ -3,15 +3,16 @@ package ocrworker
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/couchbaselabs/go.assert"
-	"github.com/couchbaselabs/logg"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/couchbaselabs/go.assert"
+	"github.com/couchbaselabs/logg"
 )
 
 // This test assumes that rabbit mq is running
-func TestOcrHttpHandlerIntegration(t *testing.T) {
+func DisabledTestOcrHttpHandlerIntegration(t *testing.T) {
 
 	rabbitConfig := rabbitConfigForTests()
 

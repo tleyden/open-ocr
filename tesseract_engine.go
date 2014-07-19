@@ -1,98 +1,182 @@
 package ocrworker
 
 import (
-	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"os/exec"
 
-	"github.com/GeertJohan/go.leptonica"
-	"github.com/GeertJohan/go.tesseract"
 	"github.com/couchbaselabs/logg"
 )
 
-const TESSERACT_MODEL_DIR = "/usr/local/share/tessdata"
-const TESSERACT_LANG = "eng"
-
+// This variant of the TesseractEngine calls tesseract via exec
 type TesseractEngine struct {
+}
+
+type TesseractEngineArgs struct {
+	configVars  map[string]string `json:"config_vars"`
+	pageSegMode string            `json:"psm"`
+}
+
+func NewTesseractEngineArgs(ocrRequest OcrRequest) (*TesseractEngineArgs, error) {
+
+	engineArgs := &TesseractEngineArgs{}
+
+	if ocrRequest.EngineArgs == nil {
+		return engineArgs, nil
+	}
+
+	// config vars
+	configVarsMapInterfaceOrig := ocrRequest.EngineArgs["config_vars"]
+
+	if configVarsMapInterfaceOrig != nil {
+
+		logg.LogTo("OCR_TESSERACT", "got configVarsMap: %v type: %T", configVarsMapInterfaceOrig, configVarsMapInterfaceOrig)
+
+		configVarsMapInterface := configVarsMapInterfaceOrig.(map[string]interface{})
+
+		configVarsMap := make(map[string]string)
+		for k, v := range configVarsMapInterface {
+			v, ok := v.(string)
+			if !ok {
+				return nil, fmt.Errorf("Could not convert configVar into string: %v", v)
+			}
+			configVarsMap[k] = v
+		}
+
+		engineArgs.configVars = configVarsMap
+
+	}
+
+	// page seg mode
+	pageSegMode := ocrRequest.EngineArgs["psm"]
+	if pageSegMode != nil {
+		pageSegModeStr, ok := pageSegMode.(string)
+		if !ok {
+			return nil, fmt.Errorf("Could not convert psm into string: %v", pageSegMode)
+		}
+		engineArgs.pageSegMode = pageSegModeStr
+	}
+	return engineArgs, nil
+
+}
+
+// return a slice that can be passed to tesseract binary as command line
+// args, eg, ["-c", "tessedit_char_whitelist=0123456789", "-c", "foo=bar"]
+func (t TesseractEngineArgs) Export() []string {
+	result := []string{}
+	for k, v := range t.configVars {
+		result = append(result, "-c")
+		keyValArg := fmt.Sprintf("%s=%s", k, v)
+		result = append(result, keyValArg)
+	}
+	if t.pageSegMode != "" {
+		result = append(result, "-psm")
+		result = append(result, t.pageSegMode)
+	}
+	return result
 }
 
 func (t TesseractEngine) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error) {
 
-	ocrResult := OcrResult{Text: "Error"}
-	err := errors.New("")
+	tmpFileName, err := func() (string, error) {
+		if ocrRequest.ImgUrl != "" {
+			return t.tmpFileFromImageUrl(ocrRequest.ImgUrl)
+		} else {
+			return t.tmpFileFromImageBytes(ocrRequest.ImgBytes)
+		}
 
-	if ocrRequest.ImgUrl != "" {
-		ocrResult, err = t.ProcessImageUrl(ocrRequest.ImgUrl)
-	} else {
-		ocrResult, err = t.ProcessImageBytes(ocrRequest.ImgBytes)
+	}()
+
+	if err != nil {
+		logg.LogTo("OCR_TESSERACT", "error getting tmpFileName")
+		return OcrResult{}, err
 	}
+
+	defer os.Remove(tmpFileName)
+
+	engineArgs, err := NewTesseractEngineArgs(ocrRequest)
+	if err != nil {
+		logg.LogTo("OCR_TESSERACT", "error getting engineArgs")
+		return OcrResult{}, err
+	}
+
+	ocrResult, err := t.processImageFile(tmpFileName, *engineArgs)
 
 	return ocrResult, err
 
 }
 
-func (t TesseractEngine) ProcessImageBytes(imgBytes []byte) (OcrResult, error) {
+func (t TesseractEngine) tmpFileFromImageBytes(imgBytes []byte) (string, error) {
 
 	tmpFileName, err := createTempFileName()
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
-	defer os.Remove(tmpFileName)
 
 	// we have to write the contents of the image url to a temp
 	// file, because the leptonica lib can't seem to handle byte arrays
 	err = saveBytesToFileName(imgBytes, tmpFileName)
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
 
-	return t.processImageFile(tmpFileName)
+	return tmpFileName, nil
 
 }
 
-func (t TesseractEngine) ProcessImageUrl(imgUrl string) (OcrResult, error) {
-
-	logg.LogTo("OCR_TESSERACT", "ProcessImageUrl()")
+func (t TesseractEngine) tmpFileFromImageUrl(imgUrl string) (string, error) {
 
 	tmpFileName, err := createTempFileName()
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
-	defer os.Remove(tmpFileName)
 	// we have to write the contents of the image url to a temp
 	// file, because the leptonica lib can't seem to handle byte arrays
 	err = saveUrlContentToFileName(imgUrl, tmpFileName)
 	if err != nil {
-		return OcrResult{}, err
+		return "", err
 	}
 
-	return t.processImageFile(tmpFileName)
+	return tmpFileName, nil
 
 }
 
-func (t TesseractEngine) processImageFile(tmpFileName string) (OcrResult, error) {
+func (t TesseractEngine) processImageFile(inputFilename string, engineArgs TesseractEngineArgs) (OcrResult, error) {
 
-	tess, err := tesseract.NewTess(TESSERACT_MODEL_DIR, TESSERACT_LANG)
+	// if the input filename is /tmp/ocrimage, set the output file basename
+	// to /tmp/ocrimage as well, which will produce /tmp/ocrimage.txt output
+	tmpOutFileBaseName := inputFilename
+
+	// the actual file it writes to will have a .txt extension
+	tmpOutFileName := fmt.Sprintf("%s.txt", inputFilename)
+
+	// delete output file when we are done
+	defer os.Remove(tmpOutFileName)
+
+	// build args array
+	cflags := engineArgs.Export()
+	cmdArgs := []string{inputFilename, tmpOutFileBaseName}
+	cmdArgs = append(cmdArgs, cflags...)
+	logg.LogTo("OCR_TESSERACT", "cmdArgs: %v", cmdArgs)
+
+	// exec tesseract
+	cmd := exec.Command("tesseract", cmdArgs...)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
+		logg.LogTo("OCR_TESSERACT", "Error exec tesseract: %v %v", err, string(output))
 		return OcrResult{}, err
 	}
-	defer tess.Close()
 
-	pix, err := leptonica.NewPixFromFile(tmpFileName)
-
+	// get data from outfile
+	outBytes, err := ioutil.ReadFile(tmpOutFileName)
 	if err != nil {
+		logg.LogTo("OCR_TESSERACT", "Error getting data from out file: %v", err)
 		return OcrResult{}, err
 	}
-	defer pix.Close()
-
-	// set the image to the tesseract instance
-	tess.SetImagePix(pix)
-
-	// retrieve text from the tesseract instance
-	fmt.Println(tess.Text())
 
 	return OcrResult{
-		Text: tess.Text(),
+		Text: string(outBytes),
 	}, nil
 
 }
