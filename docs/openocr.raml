@@ -1,0 +1,26 @@
+#%RAML 0.8
+---
+title: OpenOCR API
+baseUri: http://api.openocr.net
+version: v1
+
+schemas:
+ - ocr: !include api_schema.json
+
+/ocr:
+  post:
+    body:
+      application/json:
+        schema: ocr
+        example: |
+          {  
+            "img_url":"http://bit.ly/ocrimage",
+            "engine":"tesseract",
+            "engine_args":{  
+              "config_vars":{  
+                "tessedit_char_whitelist":"0123456789"
+              },
+              "psm":"3"
+            }
+          }
+        
