@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "OpenOCR OCR Processing Request",
+    "description": "A request to convert an image into text",
+    "type": "object",
+    "properties": {
+        "img_url": {
+            "description": "The URL of the image to process.",
+            "type": "string"
+        },
+        "engine": {
+            "description": "The OCR engine to use",
+            "enum": [ "tesseract", "go_tesseract", "mock" ]
+        },
+        "engine_args": {
+            "type": "object",
+            "description": "The OCR engine arguments to pass (engine-specific)",
+	    "properties": {
+		"config_vars": {
+		    "type": "object",
+		    "description": "Config vars - equivalent of -c args to tesseract"
+		},
+		"psm": {
+		    "description": "Page Segment Mode, equivalent of -psm arg to tesseract",
+		    "enum": [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" ]
+		}
+	    },
+	    "additionalProperties": false
+        }
+    },
+    "required": ["img_url", "engine"],
+    "additionalProperties": false
+}
