@@ -11,8 +11,8 @@
 #   https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard
 #
 
-if [ ! -n "$DOCKER_HOST" ] ; then
-  echo "You must define DOCKER_HOST"
+if [ ! -n "$RABBITMQ_HOST" ] ; then
+  echo "You must define RABBITMQ_HOST"
   exit
 fi
 
