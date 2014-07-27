@@ -30,7 +30,7 @@ eth0      Link encap:Ethernet  HWaddr 08:00:27:43:40:c7
           ...
 ```
 
-The ip address `10.0.2.15` will be used as the `DOCKER_HOST` env variable below.
+The ip address `10.0.2.15` will be used as the `RABBITMQ_HOST` env variable below.
 
 ## Launch docker images
 
@@ -38,7 +38,7 @@ Here's how to launch the docker images needed for OpenOCR.
 
 ```
 $ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
-$ export DOCKER_HOST=10.0.2.15 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ export RABBITMQ_HOST=10.0.2.15 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 ```
