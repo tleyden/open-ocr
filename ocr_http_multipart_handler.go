@@ -23,10 +23,11 @@ func NewOcrHttpMultipartHandler(r RabbitConfig) *OcrHttpMultipartHandler {
 	}
 }
 
-func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (s *OcrHttpMultipartHandler) extractParts(req *http.Request) (OcrRequest, *multipart.Part, error) {
 
-	defer req.Body.Close()
 	logg.LogTo("OCR_HTTP", "request to ocr-file-upload")
+	ocrReq := OcrRequest{}
+	// var imagePart *multipart.Part
 
 	switch req.Method {
 	case "POST":
@@ -37,15 +38,13 @@ func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Req
 		logg.LogTo("OCR_HTTP", "content type: %v", contentType)
 
 		if !strings.HasPrefix(h, "multipart/related") {
-			http.Error(w, "Expected multipart related", 500)
-			return
+			return ocrReq, nil, fmt.Errorf("Expected multipart related")
 		}
 
 		reader := multipart.NewReader(req.Body, attrs["boundary"])
 
-		ocrReq := OcrRequest{}
-
 		for {
+
 			part, err := reader.NextPart()
 
 			if err == io.EOF {
@@ -61,38 +60,76 @@ func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Req
 				decoder := json.NewDecoder(part)
 				err := decoder.Decode(&ocrReq)
 				if err != nil {
-					logg.LogError(err)
-					http.Error(w, "Unable to unmarshal json", 500)
-					return
+					return ocrReq, nil, fmt.Errorf("Unable to unmarshal json: %s", err)
 				}
-
+				part.Close()
 			default:
 				if !strings.HasPrefix(contentType, "image") {
 
-					http.Error(w, "Expected content-type to start with image/", 500)
-					return
+					return ocrReq, nil, fmt.Errorf("Expected content-type: image/*")
 				}
 
-				// dump part to output (for now ..)
-
-				partContents, err := ioutil.ReadAll(part)
-				if err != nil {
-					logg.LogTo("OCR_HTTP", "failed to read mime part")
-					http.Error(w, "Filed to read mime part", 500)
-					return
-				}
-				logg.LogTo("OCR_HTTP", "partContents: %v", partContents)
+				// hack: this forces it to come in the order:
+				// json / image, which I was trying to avoid.
+				// was getting EOF when saving part and returning
+				// TODO: read into []byte and return that
+				return ocrReq, part, nil
 
 			}
 
-			part.Close()
-
 		}
-		fmt.Fprintf(w, "yo")
+
+		return ocrReq, nil, fmt.Errorf("Didn't expect to get this far")
 
 	default:
-		http.Error(w, "This endpoint only accepts POST requests", 500)
+		return ocrReq, nil, fmt.Errorf("This endpoint only accepts POST requests")
 	}
+
+}
+
+func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+	defer req.Body.Close()
+
+	ocrRequest, imagePartReader, err := s.extractParts(req)
+	if err != nil {
+		logg.LogError(err)
+		errStr := fmt.Sprint("%v", err)
+		http.Error(w, errStr, 500)
+		return
+	}
+
+	logg.LogTo("OCR_HTTP", "ocrRequest: %v", ocrRequest)
+
+	// dump part to output (for now ..)
+
+	partContents, err := ioutil.ReadAll(imagePartReader)
+	if err != nil {
+		logg.LogTo("OCR_HTTP", "Failed to read mime part: %v", err)
+		http.Error(w, "Failed to read mime part", 500)
+		return
+	}
+	ocrRequest.ImgBytes = partContents
+
+	ocrClient, err := NewOcrRpcClient(s.RabbitConfig)
+	if err != nil {
+		logg.LogError(err)
+		http.Error(w, "Unable to create rpc client", 500)
+		return
+	}
+
+	decodeResult, err := ocrClient.DecodeImage(ocrRequest)
+
+	if err != nil {
+		logg.LogError(err)
+		http.Error(w, "Unable to perform OCR decode", 500)
+		return
+	}
+
+	logg.LogTo("OCR_HTTP", "decodeResult: %v", decodeResult)
+
+	logg.LogTo("OCR_HTTP", "ocrReq: %v", ocrRequest)
+	fmt.Fprintf(w, decodeResult.Text)
 
 	/*
 
