@@ -23,36 +23,65 @@ func (s *OcrHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	logg.LogTo("OCR_HTTP", "serveHttp called")
 	defer req.Body.Close()
 
-	ocrReq := OcrRequest{}
+	ocrRequest := OcrRequest{}
 	decoder := json.NewDecoder(req.Body)
-	err := decoder.Decode(&ocrReq)
+	err := decoder.Decode(&ocrRequest)
 	if err != nil {
 		logg.LogError(err)
 		http.Error(w, "Unable to unmarshal json", 500)
 		return
 	}
 
-	// TODO: call func HandleOcrRequest(ocrRequest OcrRequest, rabbitConfig RabbitConfig) (OcrResult, error) instead of
-	// code below
+	ocrResult, err := HandleOcrRequest(ocrRequest, s.RabbitConfig)
 
-	ocrClient, err := NewOcrRpcClient(s.RabbitConfig)
 	if err != nil {
-		logg.LogError(err)
-		http.Error(w, "Unable to create rpc client", 500)
+		msg := "Unable to perform OCR decode.  Error: %v"
+		errMsg := fmt.Sprintf(msg, err)
+		logg.LogError(fmt.Errorf(errMsg))
+		http.Error(w, errMsg, 500)
 		return
 	}
 
-	decodeResult, err := ocrClient.DecodeImage(ocrReq)
+	logg.LogTo("OCR_HTTP", "ocrResult: %v", ocrResult)
 
-	if err != nil {
-		logg.LogError(err)
-		http.Error(w, "Unable to perform OCR decode", 500)
-		return
+	fmt.Fprintf(w, ocrResult.Text)
+
+}
+
+func HandleOcrRequest(ocrRequest OcrRequest, rabbitConfig RabbitConfig) (OcrResult, error) {
+
+	switch ocrRequest.InplaceDecode {
+	case true:
+		// inplace decode: short circuit rabbitmq, and just call
+		// ocr engine directly
+		ocrEngine := NewOcrEngine(ocrRequest.EngineType)
+
+		ocrResult, err := ocrEngine.ProcessRequest(ocrRequest)
+
+		if err != nil {
+			msg := "Error processing ocr request.  Error: %v"
+			errMsg := fmt.Sprintf(msg, err)
+			logg.LogError(fmt.Errorf(errMsg))
+			return OcrResult{}, err
+		}
+
+		return ocrResult, nil
+	default:
+		// add a new job to rabbitmq and wait for worker to respond w/ result
+		ocrClient, err := NewOcrRpcClient(rabbitConfig)
+		if err != nil {
+			logg.LogError(err)
+			return OcrResult{}, err
+		}
+
+		ocrResult, err := ocrClient.DecodeImage(ocrRequest)
+
+		if err != nil {
+			logg.LogError(err)
+			return OcrResult{}, err
+		}
+
+		return ocrResult, nil
 	}
-
-	logg.LogTo("OCR_HTTP", "decodeResult: %v", decodeResult)
-
-	logg.LogTo("OCR_HTTP", "ocrReq: %v", ocrReq)
-	fmt.Fprintf(w, decodeResult.Text)
 
 }

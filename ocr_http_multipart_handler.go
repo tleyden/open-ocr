@@ -87,41 +87,6 @@ func (s *OcrHttpMultipartHandler) extractParts(req *http.Request) (OcrRequest, e
 
 }
 
-func HandleOcrRequest(ocrRequest OcrRequest, rabbitConfig RabbitConfig) (OcrResult, error) {
-
-	switch ocrRequest.InplaceDecode {
-	case true:
-		ocrEngine := NewOcrEngine(ocrRequest.EngineType)
-
-		ocrResult, err := ocrEngine.ProcessRequest(ocrRequest)
-
-		if err != nil {
-			msg := "Error processing ocr request.  Error: %v"
-			errMsg := fmt.Sprintf(msg, err)
-			logg.LogError(fmt.Errorf(errMsg))
-			return OcrResult{}, err
-		}
-
-		return ocrResult, nil
-	default:
-		ocrClient, err := NewOcrRpcClient(rabbitConfig)
-		if err != nil {
-			logg.LogError(err)
-			return OcrResult{}, err
-		}
-
-		ocrResult, err := ocrClient.DecodeImage(ocrRequest)
-
-		if err != nil {
-			logg.LogError(err)
-			return OcrResult{}, err
-		}
-
-		return ocrResult, nil
-	}
-
-}
-
 func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	defer req.Body.Close()
@@ -129,7 +94,7 @@ func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Req
 	ocrRequest, err := s.extractParts(req)
 	if err != nil {
 		logg.LogError(err)
-		errStr := fmt.Sprint("%v", err)
+		errStr := fmt.Sprintf("Error extracting multipart/related parts: %v", err)
 		http.Error(w, errStr, 500)
 		return
 	}
@@ -139,7 +104,7 @@ func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Req
 	ocrResult, err := HandleOcrRequest(ocrRequest, s.RabbitConfig)
 
 	if err != nil {
-		msg := "Error processing ocr request.  Error: %v"
+		msg := "Unable to perform OCR decode.  Error: %v"
 		errMsg := fmt.Sprintf(msg, err)
 		logg.LogError(fmt.Errorf(errMsg))
 		http.Error(w, errMsg, 500)
