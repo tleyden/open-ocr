@@ -8,11 +8,10 @@ type OcrRequest struct {
 	ImgBytes          []byte                 `json:"img_bytes"`
 	PreprocessorChain []string               `json:"preprocessors"`
 	PreprocessorArgs  map[string]interface{} `json:"preprocessor-args"`
+	EngineArgs        map[string]interface{} `json:"engine_args"`
 
-	// TODO: need a way to have it generic here, but able to convert
-	// into a TesseractEngineExec struct that is specific to TesserectExec
-
-	EngineArgs map[string]interface{} `json:"engine_args"`
+	// decode ocr in http handler rather than putting in queue
+	InplaceDecode bool `json:"inplace_decode"`
 }
 
 // figure out the next pre-processor routing key to use (if any).

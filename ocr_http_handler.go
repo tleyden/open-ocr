@@ -32,6 +32,9 @@ func (s *OcrHttpHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// TODO: call func HandleOcrRequest(ocrRequest OcrRequest, rabbitConfig RabbitConfig) (OcrResult, error) instead of
+	// code below
+
 	ocrClient, err := NewOcrRpcClient(s.RabbitConfig)
 	if err != nil {
 		logg.LogError(err)
