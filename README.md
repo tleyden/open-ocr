@@ -56,7 +56,7 @@ You are now ready to decode images → text via your REST API.
 **Request**
 
 ```
-$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$DOCKER_HOST:$HTTP_PORT/ocr
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$RABBITMQ_HOST:$HTTP_PORT/ocr
 ```
 
 **Response**

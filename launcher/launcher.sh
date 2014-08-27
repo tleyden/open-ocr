@@ -34,7 +34,7 @@ else
       export DOCKER="docker"
 fi
 
-export AMQP_URI=amqp://admin:${RABBITMQ_PASS}@${DOCKER_HOST}/
+export AMQP_URI=amqp://admin:${RABBITMQ_PASS}@${RABBITMQ_HOST}/
 
 $DOCKER run -d -p 5672:5672 -p 15672:15672 -e RABBITMQ_PASS=${RABBITMQ_PASS} tutum/rabbitmq
 
