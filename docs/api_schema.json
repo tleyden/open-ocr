@@ -26,7 +26,11 @@
 		}
 	    },
 	    "additionalProperties": false
-        }
+        },
+	"inplace_decode": {
+	    "type": "boolean",
+	    "description": "If true, will attempt to do ocr decode in-place rather than queuing a message on RabbitMQ for worker processing.  Useful for local testing, not recommended for production."
+	}
     },
     "required": ["img_url", "engine"],
     "additionalProperties": false

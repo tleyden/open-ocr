@@ -9,13 +9,28 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 # Features
 
-* Scalable message passing architecture
-* Platform independence via Docker containers
-* Improved accuracy via [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) image preprocessing.
-* Pass arguments to Tesseract such as character whitelist and page segment mode
+* Scalable message passing architecture via RabbitMQ.
+* Platform independence via Docker containers.
+* Ability to use an image pre-processing chain.  An example using [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) is provided.
+* Pass arguments to Tesseract such as character whitelist and page segment mode.
 * [REST API docs](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html)
+* A [Go REST client](http://github.com/tleyden/open-ocr-client) is available.
+
+# Launching OpenOCR on a Docker PAAS
+
+OpenOCR can easily run on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:
+
+* [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
+* [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
+* [Tutum](https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum)
+
+If your preferred PAAS isn't listed, please open a [Github issue](https://github.com/tleyden/open-ocr/issues) to request instructions.
 
 # Launching OpenOCR on Ubuntu 14.04
+
+OpenOCR can be launched on anything that supports Docker, such as Ubuntu 14.04.  
+
+Here's how to install it from scratch and verify that it's working correctly.
 
 ## Install Docker
 
@@ -56,7 +71,7 @@ You are now ready to decode images → text via your REST API.
 **Request**
 
 ```
-$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$RABBITMQ_HOST:$HTTP_PORT/ocr
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://10.0.2.15:$HTTP_PORT/ocr
 ```
 
 **Response**
@@ -76,16 +91,14 @@ below I have used a few variations that work for variable names.
 
 ```
 
-To see other parameters that you can pass in the request, see the [REST API docs](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html)
+The REST API also supports:
 
-# Launching OpenOCR on a Docker PAAS
+* Uploading the image content via `multipart/related`, rather than passing an image URL.  (example client code provided in the [Go REST client](http://github.com/tleyden/open-ocr-client))
+* Tesseract config vars (eg, equivalent of -c arguments when using Tesseract via the command line) and Page Seg Mode 
+* Ability to use an image pre-processing chain, eg [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform).
 
-You can also run OpenOCR on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:
+See the [REST API docs](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html) and the [Go REST client](http://github.com/tleyden/open-ocr-client) for details.
 
-* [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
-* [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
-* [Tutum](https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum)
-* More coming soon ..
 
 # Community
 

@@ -29,3 +29,20 @@ schemas:
           text/plain:
             example: |
                 You can create local variables ..
+
+
+/ocr-file-upload:
+  post:
+    body:
+      multipart/related:
+	application/json:
+	  schema: ocr
+        image/*:
+	  
+    responses:
+      200:
+        body:
+          text/plain:
+            example: |
+                You can create local variables ..
+	
