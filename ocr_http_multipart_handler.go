@@ -118,18 +118,27 @@ func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Req
 		return
 	}
 
-	decodeResult, err := ocrClient.DecodeImage(ocrRequest)
+	logg.LogTo("OCR_HTTP", "ocrClient: %v", ocrClient)
+
+	// TODO: add if inline-decode==true
+
+	// decodeResult, err := ocrClient.DecodeImage(ocrRequest)
+
+	ocrEngine := NewOcrEngine(ocrRequest.EngineType)
+
+	ocrResult, err := ocrEngine.ProcessRequest(ocrRequest)
 
 	if err != nil {
-		logg.LogError(err)
-		http.Error(w, "Unable to perform OCR decode", 500)
+		msg := "Error processing ocr request.  Error: %v"
+		errMsg := fmt.Sprintf(msg, err)
+		logg.LogError(fmt.Errorf(errMsg))
 		return
 	}
 
-	logg.LogTo("OCR_HTTP", "decodeResult: %v", decodeResult)
+	logg.LogTo("OCR_HTTP", "ocrResult: %v", ocrResult)
 
 	logg.LogTo("OCR_HTTP", "ocrReq: %v", ocrRequest)
-	fmt.Fprintf(w, decodeResult.Text)
+	fmt.Fprintf(w, ocrResult.Text)
 
 	/*
 
