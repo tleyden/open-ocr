@@ -4,9 +4,9 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
     <title>OpenOCR by tleyden</title>
   </head>
@@ -40,13 +40,29 @@
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h1>
 
 <ul>
-<li>Scalable message passing architecture</li>
-<li>Platform independence via Docker containers</li>
-<li>Improved accuracy via <a href="https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform">Stroke Width Transform</a> image preprocessing.</li>
-<li>Pass arguments to Tesseract such as character whitelist and page segment mode</li>
+<li>Scalable message passing architecture via RabbitMQ.</li>
+<li>Platform independence via Docker containers.</li>
+<li>Ability to use an image pre-processing chain.  An example using <a href="https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform">Stroke Width Transform</a> is provided.</li>
+<li>Pass arguments to Tesseract such as character whitelist and page segment mode.</li>
 <li><a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html">REST API docs</a></li>
+<li>A <a href="http://github.com/tleyden/open-ocr-client">Go REST client</a> is available.</li>
 </ul><h1>
+<a name="launching-openocr-on-a-docker-paas" class="anchor" href="#launching-openocr-on-a-docker-paas"><span class="octicon octicon-link"></span></a>Launching OpenOCR on a Docker PAAS</h1>
+
+<p>OpenOCR can easily run on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:</p>
+
+<ul>
+<li><a href="https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine">Google Compute Engine</a></li>
+<li><a href="https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard">Orchard</a></li>
+<li><a href="https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum">Tutum</a></li>
+</ul><p>If your preferred PAAS isn't listed, please open a <a href="https://github.com/tleyden/open-ocr/issues">Github issue</a> to request instructions.</p>
+
+<h1>
 <a name="launching-openocr-on-ubuntu-1404" class="anchor" href="#launching-openocr-on-ubuntu-1404"><span class="octicon octicon-link"></span></a>Launching OpenOCR on Ubuntu 14.04</h1>
+
+<p>OpenOCR can be launched on anything that supports Docker, such as Ubuntu 14.04.  </p>
+
+<p>Here's how to install it from scratch and verify that it's working correctly.</p>
 
 <h2>
 <a name="install-docker" class="anchor" href="#install-docker"><span class="octicon octicon-link"></span></a>Install Docker</h2>
@@ -62,7 +78,7 @@ eth0      Link encap:Ethernet  HWaddr 08:00:27:43:40:c7
           ...
 </code></pre>
 
-<p>The ip address <code>10.0.2.15</code> will be used as the <code>DOCKER_HOST</code> env variable below.</p>
+<p>The ip address <code>10.0.2.15</code> will be used as the <code>RABBITMQ_HOST</code> env variable below.</p>
 
 <h2>
 <a name="launch-docker-images" class="anchor" href="#launch-docker-images"><span class="octicon octicon-link"></span></a>Launch docker images</h2>
@@ -70,7 +86,7 @@ eth0      Link encap:Ethernet  HWaddr 08:00:27:43:40:c7
 <p>Here's how to launch the docker images needed for OpenOCR.</p>
 
 <pre><code>$ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
-$ export DOCKER_HOST=10.0.2.15 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
+$ export RABBITMQ_HOST=10.0.2.15 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
 $ chmod +x launcher.sh
 $ ./launcher.sh
 </code></pre>
@@ -88,7 +104,7 @@ $ ./launcher.sh
 
 <p><strong>Request</strong></p>
 
-<pre><code>$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://$DOCKER_HOST:$HTTP_PORT/ocr
+<pre><code>$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://10.0.2.15:$HTTP_PORT/ocr
 </code></pre>
 
 <p><strong>Response</strong></p>
@@ -107,19 +123,15 @@ below I have used a few variations that work for variable names.
 
 </code></pre>
 
-<p>To see other parameters that you can pass in the request, see the <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html">REST API docs</a></p>
-
-<h1>
-<a name="launching-openocr-on-a-docker-paas" class="anchor" href="#launching-openocr-on-a-docker-paas"><span class="octicon octicon-link"></span></a>Launching OpenOCR on a Docker PAAS</h1>
-
-<p>You can also run OpenOCR on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:</p>
+<p>The REST API also supports:</p>
 
 <ul>
-<li><a href="https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine">Google Compute Engine</a></li>
-<li><a href="https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard">Orchard</a></li>
-<li><a href="https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum">Tutum</a></li>
-<li>More coming soon ..</li>
-</ul><h1>
+<li>Uploading the image content via <code>multipart/related</code>, rather than passing an image URL.  (example client code provided in the <a href="http://github.com/tleyden/open-ocr-client">Go REST client</a>)</li>
+<li>Tesseract config vars (eg, equivalent of -c arguments when using Tesseract via the command line) and Page Seg Mode </li>
+<li>Ability to use an image pre-processing chain, eg <a href="https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform">Stroke Width Transform</a>.</li>
+</ul><p>See the <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html">REST API docs</a> and the <a href="http://github.com/tleyden/open-ocr-client">Go REST client</a> for details.</p>
+
+<h1>
 <a name="community" class="anchor" href="#community"><span class="octicon octicon-link"></span></a>Community</h1>
 
 <ul>
