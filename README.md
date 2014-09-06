@@ -13,7 +13,7 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 * Platform independence via Docker containers.
 * Ability to use an image pre-processing chain.  An example using [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) is provided.
 * Pass arguments to Tesseract such as character whitelist and page segment mode.
-* [REST API docs](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html)
+* [REST API docs](http://docs.openocr.apiary.io/)
 * A [Go REST client](http://github.com/tleyden/open-ocr-client) is available.
 
 # Launching OpenOCR on a Docker PAAS
@@ -97,7 +97,7 @@ The REST API also supports:
 * Tesseract config vars (eg, equivalent of -c arguments when using Tesseract via the command line) and Page Seg Mode 
 * Ability to use an image pre-processing chain, eg [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform).
 
-See the [REST API docs](http://htmlpreview.github.io/?https://raw.githubusercontent.com/tleyden/open-ocr/master/docs/openocr.html) and the [Go REST client](http://github.com/tleyden/open-ocr-client) for details.
+See the [REST API docs](http://docs.openocr.apiary.io/) and the [Go REST client](http://github.com/tleyden/open-ocr-client) for details.
 
 
 # Community
