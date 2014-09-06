@@ -11,6 +11,7 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 * Scalable message passing architecture via RabbitMQ.
 * Platform independence via Docker containers.
+* Supports 31 languages in addition to English 
 * Ability to use an image pre-processing chain.  An example using [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) is provided.
 * Pass arguments to Tesseract such as character whitelist and page segment mode.
 * [REST API docs](http://docs.openocr.apiary.io/)
@@ -96,6 +97,7 @@ The REST API also supports:
 * Uploading the image content via `multipart/related`, rather than passing an image URL.  (example client code provided in the [Go REST client](http://github.com/tleyden/open-ocr-client))
 * Tesseract config vars (eg, equivalent of -c arguments when using Tesseract via the command line) and Page Seg Mode 
 * Ability to use an image pre-processing chain, eg [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform).
+* Non-English languages
 
 See the [REST API docs](http://docs.openocr.apiary.io/) and the [Go REST client](http://github.com/tleyden/open-ocr-client) for details.
 
