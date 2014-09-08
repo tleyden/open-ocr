@@ -7,7 +7,8 @@ import (
 	"net/http"
 
 	"github.com/couchbaselabs/logg"
-	"github.com/tleyden/open-ocr"
+	"github.com/mcqueenorama/open-ocr"
+	"github.com/streadway/handy/cors"
 )
 
 // This assumes that there is a worker running
@@ -42,9 +43,11 @@ func main() {
 		fmt.Fprintf(w, text)
 	})
 
-	http.Handle("/ocr", ocrworker.NewOcrHttpHandler(rabbitConfig))
+	http.Handle("/ocr", cors.Get("*", ocrworker.NewOcrHttpHandler(rabbitConfig)))
+	// http.Handle("/ocr", ocrworker.NewOcrHttpHandler(rabbitConfig))
 
-	http.Handle("/ocr-file-upload", ocrworker.NewOcrHttpMultipartHandler(rabbitConfig))
+	http.Handle("/ocr-file-upload", cors.Get("*", ocrworker.NewOcrHttpMultipartHandler(rabbitConfig)))
+	// http.Handle("/ocr-file-upload", ocrworker.NewOcrHttpMultipartHandler(rabbitConfig))
 
 	// add a handler to serve up an image from the filesystem.
 	// ignore this, was just something for testing ..
