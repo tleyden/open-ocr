@@ -96,6 +96,7 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 		}
 	}
 
+	logg.LogTo("OCR_CLIENT", "routing req args:EngineArgs:%v:PreprocessorArgs:%v:PreprocessorChain:%v:", ocrRequest.EngineArgs, ocrRequest.PreprocessorArgs, ocrRequest.PreprocessorChain)
 	logg.LogTo("OCR_CLIENT", "ocrRequest before: %v", ocrRequest)
 	routingKey := ocrRequest.nextPreprocessor(c.rabbitConfig.RoutingKey)
 	logg.LogTo("OCR_CLIENT", "publishing with routing key %q", routingKey)
@@ -105,6 +106,7 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 	if err != nil {
 		return OcrResult{}, err
 	}
+	// logg.LogTo("OCR_CLIENT", "ocrRequestJson: %v", ocrRequestJson)
 
 	if err = c.channel.Publish(
 		c.rabbitConfig.Exchange, // publish to an exchange

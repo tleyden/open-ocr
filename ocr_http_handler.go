@@ -74,6 +74,8 @@ func HandleOcrRequest(ocrRequest OcrRequest, rabbitConfig RabbitConfig) (OcrResu
 			return OcrResult{}, err
 		}
 
+		logg.LogTo("OCR_HTTP", "decoding req args:EngineArgs:%v:PreprocessorArgs:%v:PreprocessorChain:%v:", ocrRequest.EngineArgs, ocrRequest.PreprocessorArgs, ocrRequest.PreprocessorChain)
+
 		ocrResult, err := ocrClient.DecodeImage(ocrRequest)
 
 		if err != nil {

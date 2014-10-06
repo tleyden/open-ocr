@@ -75,6 +75,7 @@ func (s *OcrHttpMultipartHandler) extractParts(req *http.Request) (OcrRequest, e
 				if err != nil {
 					return ocrReq, fmt.Errorf("Unable to unmarshal json: %s", err)
 				}
+				logg.LogTo("OCR_HTTP", "decoded req args:EngineArgs:%v:PreprocessorArgs:%v:PreprocessorChain:%v:", ocrReq.EngineArgs, ocrReq.PreprocessorArgs, ocrReq.PreprocessorChain)
 				part.Close()
 			default:
 				if !strings.HasPrefix(contentType, "image") {
@@ -86,7 +87,7 @@ func (s *OcrHttpMultipartHandler) extractParts(req *http.Request) (OcrRequest, e
 					return ocrReq, fmt.Errorf("Failed to read mime part: %v", err)
 				}
 
-				fmt.Printf("encoded image:%q:\n", partContents)
+				// fmt.Printf("encoded image:%q:\n", partContents)
 				buf := make([]byte, req.ContentLength)
 				bytesRead, err := base64.StdEncoding.Decode(buf, partContents)
 				// if err != nil {
@@ -100,7 +101,8 @@ func (s *OcrHttpMultipartHandler) extractParts(req *http.Request) (OcrRequest, e
 				}
 				fmt.Printf("decoded:bytesRead:%d:\n", bytesRead)
 
-				ocrReq.ImgBytes = buf
+				ocrReq.ImgBytes = buf[:bytesRead]
+				logg.LogTo("OCR_HTTP", "final req args:EngineArgs:%v:PreprocessorArgs:%v:PreprocessorChain:%v:", ocrReq.EngineArgs, ocrReq.PreprocessorArgs, ocrReq.PreprocessorChain)
 				return ocrReq, nil
 
 			}
@@ -127,7 +129,9 @@ func (s *OcrHttpMultipartHandler) ServeHTTP(w http.ResponseWriter, req *http.Req
 		return
 	}
 
-	logg.LogTo("OCR_HTTP", "ocrRequest: %v", ocrRequest)
+	// its gone when it gets here
+	logg.LogTo("OCR_HTTP", "sending req args:EngineArgs:%v:PreprocessorArgs:%v:PreprocessorChain:%v:", ocrRequest.EngineArgs, ocrRequest.PreprocessorArgs, ocrRequest.PreprocessorChain)
+	// logg.LogTo("OCR_HTTP", "sending ocrRequest: %v", ocrRequest)
 
 	ocrResult, err := HandleOcrRequest(ocrRequest, s.RabbitConfig)
 
