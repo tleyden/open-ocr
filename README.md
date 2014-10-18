@@ -1,4 +1,7 @@
 
+[![GoDoc](http://godoc.org/github.com/tleyden/open-ocr?status.png)](http://godoc.org/github.com/tleyden/open-ocr) 
+
+
 OpenOCR makes it simple to host your own OCR REST API.
 
 The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com/p/tesseract-ocr/).
