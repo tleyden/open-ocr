@@ -25,7 +25,7 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 OpenOCR can easily run on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:
 
 * [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
-* [Orchard](https://github.com/tleyden/open-ocr/wiki/Installation-on-Orchard)
+* [AWS](https://github.com/tleyden/open-ocr/wiki/Installation-on-CoreOS-Fleet)
 * [Tutum](https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum)
 
 If your preferred PAAS isn't listed, please open a [Github issue](https://github.com/tleyden/open-ocr/issues) to request instructions.
