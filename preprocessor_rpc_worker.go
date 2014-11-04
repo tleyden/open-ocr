@@ -11,6 +11,8 @@ import (
 	"github.com/streadway/amqp"
 )
 
+var preprocessorMap map[string]Preprocessor
+
 type PreprocessorRpcWorker struct {
 	rabbitConfig    RabbitConfig
 	conn            *amqp.Connection
@@ -21,13 +23,15 @@ type PreprocessorRpcWorker struct {
 	preprocessorMap map[string]Preprocessor
 }
 
+func init() {
+	preprocessorMap = make(map[string]Preprocessor)
+	preprocessorMap[PREPROCESSOR_STROKE_WIDTH_TRANSFORM] = StrokeWidthTransformer{}
+	preprocessorMap[PREPROCESSOR_IDENTITY] = IdentityPreprocessor{}
+}
+
 const preprocessor_tag = "preprocessor" // TODO: should be unique for each worker instance (eg, uuid)
 
 func NewPreprocessorRpcWorker(rc RabbitConfig, preprocessor string) (*PreprocessorRpcWorker, error) {
-
-	preprocessorMap := make(map[string]Preprocessor)
-	preprocessorMap[PREPROCESSOR_STROKE_WIDTH_TRANSFORM] = StrokeWidthTransformer{}
-	preprocessorMap[PREPROCESSOR_IDENTITY] = IdentityPreprocessor{}
 
 	_, ok := preprocessorMap[preprocessor]
 	if !ok {
@@ -44,6 +48,10 @@ func NewPreprocessorRpcWorker(rc RabbitConfig, preprocessor string) (*Preprocess
 		preprocessorMap: preprocessorMap,
 	}
 	return preprocessorRpcWorker, nil
+}
+
+func RegisterPreprocessor(key string, p Preprocessor) {
+	preprocessorMap[key] = p
 }
 
 func (w PreprocessorRpcWorker) Run() error {
