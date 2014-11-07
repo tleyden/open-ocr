@@ -7,7 +7,8 @@ import (
 	"net/http"
 
 	"github.com/couchbaselabs/logg"
-	"github.com/tleyden/open-ocr"
+	"github.com/mcqueenorama/open-ocr"
+	"github.com/mcqueenorama/handy/cors"
 )
 
 // This assumes that there is a worker running
@@ -32,7 +33,6 @@ func main() {
 			8080,
 			"The http port to listen on, eg, 8081",
 		)
-
 	}
 	rabbitConfig := ocrworker.DefaultConfigFlagsOverride(flagFunc)
 
@@ -42,9 +42,12 @@ func main() {
 		fmt.Fprintf(w, text)
 	})
 
-	http.Handle("/ocr", ocrworker.NewOcrHttpHandler(rabbitConfig))
+	http.Handle("/ocr", cors.Post("*", ocrworker.NewOcrHttpHandler(rabbitConfig)))
+	// http.Handle("/ocr", stack_handlers(cors_bool, [ocrworker.NewOcrHttpHandler(rabbitConfig)]))
+	// http.Handle("/ocr", ocrworker.NewOcrHttpHandler(rabbitConfig))
 
-	http.Handle("/ocr-file-upload", ocrworker.NewOcrHttpMultipartHandler(rabbitConfig))
+	http.Handle("/ocr-file-upload", cors.Post("*", ocrworker.NewOcrHttpMultipartHandler(rabbitConfig)))
+	// http.Handle("/ocr-file-upload", ocrworker.NewOcrHttpMultipartHandler(rabbitConfig))
 
 	// add a handler to serve up an image from the filesystem.
 	// ignore this, was just something for testing ..
