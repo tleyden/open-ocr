@@ -165,11 +165,8 @@ func (t TesseractEngine) processImageFile(inputFilename string, engineArgs Tesse
 	// to /tmp/ocrimage as well, which will produce /tmp/ocrimage.txt output
 	tmpOutFileBaseName := inputFilename
 
-	// the actual file it writes to will have a .txt extension
-	tmpOutFileName := fmt.Sprintf("%s.txt", inputFilename)
-
-	// delete output file when we are done
-	defer os.Remove(tmpOutFileName)
+	// possible file extensions
+	fileExtensions := []string{"txt", "hocr"}
 
 	// build args array
 	cflags := engineArgs.Export()
@@ -185,8 +182,11 @@ func (t TesseractEngine) processImageFile(inputFilename string, engineArgs Tesse
 		return OcrResult{}, err
 	}
 
-	// get data from outfile
-	outBytes, err := ioutil.ReadFile(tmpOutFileName)
+	outBytes, outFile, err := findAndReadOutfile(tmpOutFileBaseName, fileExtensions)
+
+	// delete output file when we are done
+	defer os.Remove(outFile)
+
 	if err != nil {
 		logg.LogTo("OCR_TESSERACT", "Error getting data from out file: %v", err)
 		return OcrResult{}, err
@@ -195,5 +195,36 @@ func (t TesseractEngine) processImageFile(inputFilename string, engineArgs Tesse
 	return OcrResult{
 		Text: string(outBytes),
 	}, nil
+
+}
+
+func findOutfile(outfileBaseName string, fileExtensions []string) (string, error) {
+
+	for _, fileExtension := range fileExtensions {
+
+		outFile := fmt.Sprintf("%v.%v", outfileBaseName, fileExtension)
+		logg.LogTo("OCR_TESSERACT", "checking if exists: %v", outFile)
+
+		if _, err := os.Stat(outFile); err == nil {
+			return outFile, nil
+		}
+
+	}
+
+	return "", fmt.Errorf("Could not find outfile.  Basename: %v Extensions: %v", outfileBaseName, fileExtensions)
+
+}
+
+func findAndReadOutfile(outfileBaseName string, fileExtensions []string) ([]byte, string, error) {
+
+	outfile, err := findOutfile(outfileBaseName, fileExtensions)
+	if err != nil {
+		return nil, "", err
+	}
+	outBytes, err := ioutil.ReadFile(outfile)
+	if err != nil {
+		return nil, "", err
+	}
+	return outBytes, outfile, nil
 
 }

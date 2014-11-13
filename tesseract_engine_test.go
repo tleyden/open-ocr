@@ -35,10 +35,11 @@ func TestTesseractEngineWithRequest(t *testing.T) {
 func TestTesseractEngineWithJson(t *testing.T) {
 
 	testJsons := []string{}
-	testJsons = append(testJsons, `{"engine":"tesseract_exec"}`)
-	testJsons = append(testJsons, `{"engine":"tesseract_exec", "engine_args":{}}`)
-	testJsons = append(testJsons, `{"engine":"tesseract_exec", "engine_args":null}`)
-	testJsons = append(testJsons, `{"engine":"tesseract_exec", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}, "psm":"0"}}`)
+	testJsons = append(testJsons, `{"engine":"tesseract"}`)
+	testJsons = append(testJsons, `{"engine":"tesseract", "engine_args":{}}`)
+	testJsons = append(testJsons, `{"engine":"tesseract", "engine_args":null}`)
+	testJsons = append(testJsons, `{"engine":"tesseract", "engine_args":{"config_vars":{"tessedit_char_whitelist":"0123456789"}, "psm":"1"}}`)
+	testJsons = append(testJsons, `{"engine":"tesseract", "engine_args":{"config_vars":{"tessedit_create_hocr":"1", "tessedit_pageseg_mode":"1"}, "psm":"3"}}`)
 
 	for _, testJson := range testJsons {
 		logg.LogTo("TEST", "testJson: %v", testJson)
