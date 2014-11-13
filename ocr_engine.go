@@ -25,9 +25,6 @@ func NewOcrEngine(engineType OcrEngineType) OcrEngine {
 		return &MockEngine{}
 	case ENGINE_TESSERACT:
 		return &TesseractEngine{}
-	case ENGINE_GO_TESSERACT:
-		return &GoTesseractEngine{}
-
 	}
 	return nil
 }
