@@ -1,5 +1,5 @@
 
-[![GoDoc](http://godoc.org/github.com/tleyden/open-ocr?status.png)](http://godoc.org/github.com/tleyden/open-ocr) 
+[![Build Status](https://drone.io/github.com/tleyden/open-ocr/status.png)](https://drone.io/github.com/tleyden/open-ocr/latest) [![GoDoc](http://godoc.org/github.com/tleyden/open-ocr?status.png)](http://godoc.org/github.com/tleyden/open-ocr) 
 
 
 OpenOCR makes it simple to host your own OCR REST API.
