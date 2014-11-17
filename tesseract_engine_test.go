@@ -12,6 +12,10 @@ import (
 
 func TestTesseractEngineWithRequest(t *testing.T) {
 
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	engine := TesseractEngine{}
 	bytes, err := ioutil.ReadFile("docs/testimage.png")
 	assert.True(t, err == nil)
@@ -78,6 +82,10 @@ func TestNewTesseractEngineArgs(t *testing.T) {
 }
 
 func TestTesseractEngineWithFile(t *testing.T) {
+
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
 
 	engine := TesseractEngine{}
 	engineArgs := TesseractEngineArgs{}
