@@ -105,6 +105,14 @@ The REST API also supports:
 See the [REST API docs](http://docs.openocr.apiary.io/) and the [Go REST client](http://github.com/tleyden/open-ocr-client) for details.
 
 
+# Uploading local files using curl
+
+The supplied `docs/upload-local-file.sh` provides an example of how to upload a local file using curl with `multipart/related` encoding of the json and image data:
+* usage: `docs/upload-local-file.sh <urlendpoint> <file> [mimetype]`
+* download the example ocr image `wget http://bit.ly/ocrimage`
+* example: `docs/upload-local-file.sh http://10.0.2.15:$HTTP_PORT/ocr-file-upload ocrimage` 
+
+
 # Community
 
 * Follow [@OpenOCR](https://twitter.com/openocr) on Twitter
