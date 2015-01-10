@@ -34,3 +34,11 @@ Content-Disposition: attachment; filename=\"attachment.txt\".
 	--header "Content-Type: multipart/related; boundary=\"$BOUNDARY\"" \
 	--data-binary "@-"
 
+# if you want to use the stroke-width-transform preprocessor then swap the line:
+# 
+# { \"engine\": \"tesseract\" }
+#
+# With:
+#
+# { \"engine\": \"tesseract\", \"preprocessors\":[\"stroke-width-transform\"] }
+#
