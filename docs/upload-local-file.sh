@@ -22,7 +22,7 @@ MIME_TYPE=${3:-"image/png"}
 ( echo "--$BOUNDARY
 Content-Type: application/json; charset=UTF-8
 
-{ \"engine\": \"tesseract\", \"preprocessors\":[\"stroke-width-transform\"] }
+{ \"engine\": \"tesseract\" }
 
 --$BOUNDARY
 Content-Type: $MIME_TYPE
