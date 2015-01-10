@@ -112,6 +112,7 @@ The supplied `docs/upload-local-file.sh` provides an example of how to upload a 
 * download the example ocr image `wget http://bit.ly/ocrimage`
 * example: `docs/upload-local-file.sh http://10.0.2.15:$HTTP_PORT/ocr-file-upload ocrimage` 
 
+
 # Community
 
 * Follow [@OpenOCR](https://twitter.com/openocr) on Twitter
