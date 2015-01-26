@@ -1,0 +1,28 @@
+rabbitmq:
+  image: tutum/rabbitmq
+  dns: 8.8.8.8
+  environment:
+    - "RABBITMQ_PASS=Phaish9ohbaidei6oole"
+
+openocr:
+  image: tleyden5iwx/open-ocr
+  dns: 8.8.8.8
+  volumes: 
+    - scripts/:/opt/open-ocr/
+  links:
+    - rabbitmq
+  ports:
+    - "9292:9292"
+  command: "/opt/open-ocr/open-ocr-httpd -amqp_uri amqp://admin:Phaish9ohbaidei6oole@rabbitmq/ -http_port 9292"
+
+openocrworker:
+  image: tleyden5iwx/open-ocr
+  volumes: 
+    - scripts/:/opt/open-ocr/
+  dns: 8.8.8.8
+  links:
+    - rabbitmq
+  command: "/opt/open-ocr/open-ocr-worker -amqp_uri amqp://admin:Phaish9ohbaidei6oole@rabbitmq/"
+
+
+
