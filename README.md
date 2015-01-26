@@ -70,11 +70,11 @@ This will start three docker instances:
 
 You are now ready to decode images → text via your REST API.
 
-# Launching OpenOCR wit docker and Fig
+# Launching OpenOCR with Fig
 
  * [Install docker](https://docs.docker.com/installation/)
  * [Install fig](http://www.fig.sh/install.html)
- * checkout OpenOCR repository or at least copy all files and subdirectories from OpenOCR `fig` directory
+ * Checkout OpenOCR repository or at least copy all files and subdirectories from OpenOCR `fig` directory
  * cd fig directory
  * run `fig up` to see the log in console or `fig up -d` to run containers as daemons
  
@@ -84,7 +84,6 @@ Fig will start four docker instances
 * [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 * [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 * [OpenOCR Transform Worker](https://registry.hub.docker.com/u/tleyden5iwx/open-ocr-preprocessor/)
- 
  
 # Test the REST API 
 
