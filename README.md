@@ -12,6 +12,8 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 # Features
 
+[![Join the chat at https://gitter.im/tleyden/open-ocr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tleyden/open-ocr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * Scalable message passing architecture via RabbitMQ.
 * Platform independence via Docker containers.
 * Supports 31 languages in addition to English 
