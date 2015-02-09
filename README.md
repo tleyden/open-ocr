@@ -1,5 +1,6 @@
 
 [![Build Status](https://drone.io/github.com/tleyden/open-ocr/status.png)](https://drone.io/github.com/tleyden/open-ocr/latest) [![GoDoc](http://godoc.org/github.com/tleyden/open-ocr?status.png)](http://godoc.org/github.com/tleyden/open-ocr) 
+[![Join the chat at https://gitter.im/tleyden/open-ocr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tleyden/open-ocr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 OpenOCR makes it simple to host your own OCR REST API.
@@ -11,8 +12,6 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
 # Features
-
-[![Join the chat at https://gitter.im/tleyden/open-ocr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tleyden/open-ocr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 * Scalable message passing architecture via RabbitMQ.
 * Platform independence via Docker containers.
