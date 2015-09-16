@@ -71,15 +71,15 @@ This will start three docker instances:
 
 You are now ready to decode images → text via your REST API.
 
-# Launching OpenOCR with Fig
+# Launching OpenOCR with Docker Compose
 
  * [Install docker](https://docs.docker.com/installation/)
- * [Install fig](http://www.fig.sh/install.html)
- * Checkout OpenOCR repository or at least copy all files and subdirectories from OpenOCR `fig` directory
- * cd fig directory
- * run `fig up` to see the log in console or `fig up -d` to run containers as daemons
+ * [Install docker-compose](https://docs.docker.com/compose/)
+ * Checkout OpenOCR repository or at least copy all files and subdirectories from OpenOCR `docker-compose` directory
+ * cd docker-compose directory
+ * run `docker-compose up` to see the log in console or `docker-compose up -d` to run containers as daemons
  
-Fig will start four docker instances
+Docker Compose will start four docker instances
 
 * [RabbitMQ](https://index.docker.io/u/tutum/rabbitmq/)
 * [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
