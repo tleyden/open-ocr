@@ -9,7 +9,7 @@ rabbitmq:
 strokewidthtransform:
   image: tleyden5iwx/open-ocr-preprocessor
   volumes: 
-    - scripts/:/opt/open-ocr/
+    - ./scripts/:/opt/open-ocr/
   dns: 8.8.8.8
   links:
     - rabbitmq
@@ -19,7 +19,7 @@ strokewidthtransform:
 openocrworker:
   image: tleyden5iwx/open-ocr
   volumes: 
-    - scripts/:/opt/open-ocr/
+    - ./scripts/:/opt/open-ocr/
   dns: 8.8.8.8
   links:
     - rabbitmq
@@ -30,7 +30,7 @@ openocr:
   image: tleyden5iwx/open-ocr
   dns: 8.8.8.8
   volumes: 
-    - scripts/:/opt/open-ocr/
+    - ./scripts/:/opt/open-ocr/
   links:
     - rabbitmq
   ports:
