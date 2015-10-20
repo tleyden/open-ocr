@@ -47,7 +47,7 @@ sleep 30 # workaround for startup race condition issue
 
 $DOCKER run -d -p ${HTTP_PORT}:${HTTP_PORT} --link "${RABBITMQ_HOST}" tleyden5iwx/open-ocr open-ocr-httpd -amqp_uri "${AMQP_URI}" -http_port ${HTTP_PORT}
 
-$DOCKER run -d tleyden5iwx/open-ocr --link "${RABBITMQ_HOST}" open-ocr-worker -amqp_uri "${AMQP_URI}"
+$DOCKER run -d --link "${RABBITMQ_HOST}" tleyden5iwx/open-ocr open-ocr-worker -amqp_uri "${AMQP_URI}"
 
 
 
