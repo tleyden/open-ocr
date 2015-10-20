@@ -1,0 +1,3 @@
+[submodule "watchful-nginx"]
+	path = watchful-nginx
+	url = https://github.com/occrp/watchful-nginx.git
