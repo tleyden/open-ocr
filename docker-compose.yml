@@ -1,0 +1,28 @@
+#
+# docker-compose file for open-ocr
+#
+
+openocr.rabbitmq:
+    image: tutum/rabbitmq
+    # this is *only* going to be used internally, no need for "ports" then
+    expose:
+        - "15672"
+        - "5672"
+    environment:
+        RABBITMQ_PASS: "set-your-pass-here"
+        
+openocr.httpd:
+    image: tleyden5iwx/open-ocr
+    links:
+        - openocr.rabbitmq
+    ports:
+        - "80:10080" # change the first value tu have the httpd running on a different host port
+    # is the sleep actually even needed?
+    command: sleep 30 && open-ocr-httpd -amqp_uri "amqp://admin:${RABBITMQ_PASS}@openocr.rabbitmq/" -http_port 10080
+
+
+openocr.worker:
+    image: tleyden5iwx/open-ocr
+    links:
+        - openocr.rabbitmq
+    command: open-ocr-worker -amqp_uri "amqp://admin:${RABBITMQ_PASS}@openocr.rabbitmq/"
