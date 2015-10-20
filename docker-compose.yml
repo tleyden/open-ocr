@@ -1,3 +1,23 @@
+nginx:
+    build: watchful-nginx
+    ports:
+        - "13378:80"
+    links:
+        - openocr
+    volumes:
+        - "./config/nginx/:/etc/nginx/:ro"
+        
+# Start http server
+openocr:
+  image: tleyden5iwx/open-ocr
+  volumes: 
+    - ./scripts/:/opt/open-ocr/
+  links:
+    - rabbitmq
+  expose:
+    - "9292"
+  command: "/opt/open-ocr/open-ocr-httpd -amqp_uri amqp://admin:Phaish9ohbaidei6oole@rabbitmq/ -http_port 9292"
+        
 # Start messaging broker
 rabbitmq:
   image: tutum/rabbitmq
@@ -22,13 +42,3 @@ openocrworker:
     - rabbitmq
   command: "/opt/open-ocr/open-ocr-worker -amqp_uri amqp://admin:Phaish9ohbaidei6oole@rabbitmq/"
 
-# Start http server
-openocr:
-  image: tleyden5iwx/open-ocr
-  volumes: 
-    - ./scripts/:/opt/open-ocr/
-  links:
-    - rabbitmq
-  ports:
-    - "80:9292"
-  command: "/opt/open-ocr/open-ocr-httpd -amqp_uri amqp://admin:Phaish9ohbaidei6oole@rabbitmq/ -http_port 9292"
