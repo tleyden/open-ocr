@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/couchbaselabs/logg"
-	"github.com/tleyden/open-ocr"
+	ocrworker "github.com/tleyden/open-ocr"
 )
 
 // This assumes that there is a rabbit mq running
