@@ -85,6 +85,58 @@ Docker Compose will start four docker instances
 * [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 * [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 * [OpenOCR Transform Worker](https://registry.hub.docker.com/u/tleyden5iwx/open-ocr-preprocessor/)
+
+# Launching OpenOCR with Docker Compose in Mac OS X
+
+ * [Install docker](https://docs.docker.com/installation/)
+ * [Install docker toolbox](https://www.docker.com/products/docker-toolbox)
+ * Checkout OpenOCR repository 
+ * `cd docker-compose directory`
+ * `docker-machine start default`
+ * `docker-machine env` 
+ * Look at the Docker host IP address
+ * Run  `docker-compose up -d` to run containers as daemons or `docker-compose up` to see the log in console
+ 
+Docker Compose will start four docker instances
+
+* [RabbitMQ](https://index.docker.io/u/tutum/rabbitmq/)
+* [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
+* [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
+* [OpenOCR Transform Worker](https://registry.hub.docker.com/u/tleyden5iwx/open-ocr-preprocessor/)
+
+## How to test the REST API after turning on the docker-compose up
+
+Where `IP_ADDRESS_OF_DOCKER_HOST` is what you saw when you run `docker-machine env` (e.g. 192.168.99.100)
+and where `HTTP_POST` is the port number inside the `.yml` file inside the docker-compose directory presuming it should be the same 9292.
+
+**Request**
+
+```
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://IP_ADDRESS_OF_DOCKER_HOST:HTTP_PORT/ocr
+```
+
+Assuming the values are (192.168.99.100 and 9292 respectively)
+
+```
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_url":"http://bit.ly/ocrimage","engine":"tesseract"}' http://192.168.99.100:9292/ocr
+```
+
+**Response**
+
+It will return the decoded text for the [test image](http://bit.ly/ocrimage):
+
+```
+< HTTP/1.1 200 OK
+< Date: Tue, 13 May 2014 16:18:50 GMT
+< Content-Length: 283
+< Content-Type: text/plain; charset=utf-8
+<
+You can create local variables for the pipelines within the template by
+preﬁxing the variable name with a “$" sign. Variable names have to be
+composed of alphanumeric characters and the underscore. In the example
+below I have used a few variations that work for variable names.
+
+```
  
 # Test the REST API 
 
