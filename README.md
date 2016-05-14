@@ -25,9 +25,9 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 OpenOCR can easily run on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:
 
-* [Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
-* [AWS](https://github.com/tleyden/open-ocr/wiki/Installation-on-CoreOS-Fleet)
-* [Tutum](https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum)
+* [Launch on Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
+* [Launch on AWS](https://github.com/tleyden/open-ocr/wiki/Installation-on-CoreOS-Fleet)
+* [Launch on Tutum](https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum)
 
 If your preferred PAAS isn't listed, please open a [Github issue](https://github.com/tleyden/open-ocr/issues) to request instructions.
 
@@ -52,26 +52,8 @@ eth0      Link encap:Ethernet  HWaddr 08:00:27:43:40:c7
 
 The ip address `10.0.2.15` will be used as the `RABBITMQ_HOST` env variable below.
 
-## Launch docker images
 
-Here's how to launch the docker images needed for OpenOCR.
-
-```
-$ curl -O https://raw.githubusercontent.com/tleyden/open-ocr/master/launcher/launcher.sh
-$ export RABBITMQ_HOST=10.0.2.15 RABBITMQ_PASS=supersecret2 HTTP_PORT=8080
-$ chmod +x launcher.sh
-$ ./launcher.sh
-```
-
-This will start three docker instances:
-
-* [RabbitMQ](https://index.docker.io/u/tutum/rabbitmq/)
-* [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
-* [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
-
-You are now ready to decode images → text via your REST API.
-
-# Launching OpenOCR with Docker Compose
+# Launching OpenOCR with Docker Compose on Linux
 
  * [Install docker](https://docs.docker.com/installation/)
  * [Install docker-compose](https://docs.docker.com/compose/)
@@ -86,7 +68,9 @@ Docker Compose will start four docker instances
 * [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
 * [OpenOCR Transform Worker](https://registry.hub.docker.com/u/tleyden5iwx/open-ocr-preprocessor/)
 
-# Launching OpenOCR with Docker Compose in Mac OS X
+You are now ready to decode images → text via your REST API.
+
+# Launching OpenOCR with Docker Compose on OSX
 
  * [Install docker](https://docs.docker.com/installation/)
  * [Install docker toolbox](https://www.docker.com/products/docker-toolbox)
@@ -97,12 +81,6 @@ Docker Compose will start four docker instances
  * Look at the Docker host IP address
  * Run  `docker-compose up -d` to run containers as daemons or `docker-compose up` to see the log in console
  
-Docker Compose will start four docker instances
-
-* [RabbitMQ](https://index.docker.io/u/tutum/rabbitmq/)
-* [OpenOCR Worker](https://index.docker.io/u/tleyden5iwx/open-ocr/)
-* [OpenOCR HTTP API Server](https://index.docker.io/u/tleyden5iwx/open-ocr/)
-* [OpenOCR Transform Worker](https://registry.hub.docker.com/u/tleyden5iwx/open-ocr-preprocessor/)
 
 ## How to test the REST API after turning on the docker-compose up
 
