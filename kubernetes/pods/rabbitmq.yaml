@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rabbitmq
+  labels:
+    name: rabbitmq
+spec:
+  containers:
+    - name: rabbitmq
+      image: tutum/rabbitmq
+      env:
+        - name: RABBITMQ_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-mq-password
+              key: password
+      ports:
+        - name: userport
+          containerPort: 5672
+        - name: adminport
+          containerPort: 15672

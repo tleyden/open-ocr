@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: open-ocr-httpd
+  labels:
+    name: open-ocr-httpd
+spec:
+  containers:
+    - name: open-ocr-httpd
+      image: tleyden5iwx/open-ocr
+      command:
+        - /opt/open-ocr/open-ocr-httpd
+        - -amqp_uri
+        - amqp://admin:rabbit-1f2d1e2e67df@rabbitmq/
+        - -http_port
+        - 8080
+      ports:
+        - name: httpport
+          containerPort: 8080
+

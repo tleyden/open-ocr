@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: couchbase-admin-controller
+spec:
+  replicas: 1
+  # selector identifies the set of Pods that this
+  # replicaController is responsible for managing
+  selector:
+    name: couchbase-server
+    role: admin
+  # podTemplate defines the 'cookie cutter' used for creating
+  # new pods when necessary
+  template:
+    metadata:
+      labels:
+        # Important: these labels need to match the selector above
+        # The api server enforces this constraint.
+        name: couchbase-server
+        role: admin
+    spec:
+      containers:
+        - name: couchbase-server
+          image: couchbase/server:enterprise-4.0.0-beta
+          ports:
+            - name: admin
+              containerPort: 8091
+        - name: couchbase-sidekick
+          image: tleyden5iwx/couchbase-cluster-go:latest
+          command:
+            - /bin/sh
+            - -c
+            - update-wrapper --skip-etcd-check couchbase-cluster start-couchbase-sidekick --discover-local-ip --etcd-servers http://$APP_ETCD_SERVICE_SERVICE_HOST:$APP_ETCD_SERVICE_SERVICE_PORT_CLIENT
