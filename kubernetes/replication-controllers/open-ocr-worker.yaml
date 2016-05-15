@@ -1,33 +1,20 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: couchbase-admin-controller
+  name: open-ocr-worker-rc
 spec:
   replicas: 1
-  # selector identifies the set of Pods that this
-  # replicaController is responsible for managing
   selector:
-    name: couchbase-server
-    role: admin
-  # podTemplate defines the 'cookie cutter' used for creating
-  # new pods when necessary
+    name: open-ocr-worker
   template:
     metadata:
       labels:
-        # Important: these labels need to match the selector above
-        # The api server enforces this constraint.
-        name: couchbase-server
-        role: admin
+        name: open-ocr-worker
     spec:
       containers:
-        - name: couchbase-server
-          image: couchbase/server:enterprise-4.0.0-beta
-          ports:
-            - name: admin
-              containerPort: 8091
-        - name: couchbase-sidekick
-          image: tleyden5iwx/couchbase-cluster-go:latest
+        - name: open-ocr-worker
+          image: tleyden5iwx/open-ocr
           command:
-            - /bin/sh
-            - -c
-            - update-wrapper --skip-etcd-check couchbase-cluster start-couchbase-sidekick --discover-local-ip --etcd-servers http://$APP_ETCD_SERVICE_SERVICE_HOST:$APP_ETCD_SERVICE_SERVICE_PORT_CLIENT
+            - open-ocr-worker
+            - "-amqp_uri=amqp://admin:rabbit-1f2d1e2e67df@rabbitmq-service/"
+

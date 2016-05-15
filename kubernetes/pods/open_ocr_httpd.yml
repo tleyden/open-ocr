@@ -10,7 +10,7 @@ spec:
     - 
       command: 
         - /usr/bin/open-ocr-httpd
-        - "-amqp_uri=amqp://admin:rabbit-1f2d1e2e67df@rabbitmq/ -http_port=8080"
+        - "-amqp_uri=amqp://admin:rabbit-1f2d1e2e67df@rabbitmq-service/ -http_port=8080"
       image: tleyden5iwx/open-ocr
       name: open-ocr-httpd
       ports: 
