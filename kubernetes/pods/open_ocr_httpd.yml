@@ -7,10 +7,13 @@ metadata:
   name: open-ocr-httpd
 spec: 
   containers: 
-    - 
+    -
+      env:
+        - name: RABBITMQ_PASSWORD
+          value: rabbit-1f2d1e2e67df
       command: 
         - /usr/bin/open-ocr-httpd
-        - "-amqp_uri=amqp://admin:rabbit-1f2d1e2e67df@rabbitmq-service/"
+        - -amqp_uri=amqp://admin:$(RABBITMQ_PASSWORD)@rabbitmq-service/
         - "-http_port=8080"
       image: tleyden5iwx/open-ocr
       name: open-ocr-httpd
