@@ -6,7 +6,7 @@ spec:
   ports:
     - port: 8080
       name: httpport
-      targetPort: 80
+      targetPort: 8080
   selector:
     name: open-ocr-httpd
 
