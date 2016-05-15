@@ -31,7 +31,10 @@ func main() {
 		if err != nil {
 			logg.LogPanic("Could not create rpc worker")
 		}
-		ocrWorker.Run()
+
+		if err := ocrWorker.Run(); err != nil {
+			logg.LogPanic("Error running worker: %v", err)
+		}
 
 		// this happens when connection is closed
 		err = <-ocrWorker.Done

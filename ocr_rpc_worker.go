@@ -39,6 +39,7 @@ func (w OcrRpcWorker) Run() error {
 	logg.LogTo("OCR_WORKER", "dialing %q", w.rabbitConfig.AmqpURI)
 	w.conn, err = amqp.Dial(w.rabbitConfig.AmqpURI)
 	if err != nil {
+		logg.LogTo("OCR_WORKER", "error connecting to rabbitmq %v", err)
 		return err
 	}
 
