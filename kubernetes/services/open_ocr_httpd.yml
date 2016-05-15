@@ -3,8 +3,9 @@ kind: Service
 metadata:
   name: open-ocr-httpd-service
 spec:
+  type: LoadBalancer
   ports:
-    - port: 8080
+    - port: 80
       name: httpport
       targetPort: 8080
   selector:
