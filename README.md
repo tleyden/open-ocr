@@ -15,19 +15,22 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 * Scalable message passing architecture via RabbitMQ.
 * Platform independence via Docker containers.
+* [Kubernetes support](https://github.com/tleyden/open-ocr/tree/master/kubernetes): workers can run in a Kubernetes Replication Controller
 * Supports 31 languages in addition to English 
 * Ability to use an image pre-processing chain.  An example using [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) is provided.
 * Pass arguments to Tesseract such as character whitelist and page segment mode.
 * [REST API docs](http://docs.openocr.apiary.io/)
 * A [Go REST client](http://github.com/tleyden/open-ocr-client) is available.
 
+
 # Launching OpenOCR on a Docker PAAS
 
 OpenOCR can easily run on any PAAS that supports Docker containers.  Here are the instructions for a few that have already been tested:
 
-* [Launch on Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
-* [Launch on AWS](https://github.com/tleyden/open-ocr/wiki/Installation-on-CoreOS-Fleet)
+* [Launch on Google Container Engine GKE - Kubernetes](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Container-Engine)
+* [Launch on AWS with CoreOS](https://github.com/tleyden/open-ocr/wiki/Installation-on-CoreOS-Fleet)
 * [Launch on Tutum](https://github.com/tleyden/open-ocr/wiki/Installation-on-Tutum)
+* [Launch on Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
 
 If your preferred PAAS isn't listed, please open a [Github issue](https://github.com/tleyden/open-ocr/issues) to request instructions.
 
