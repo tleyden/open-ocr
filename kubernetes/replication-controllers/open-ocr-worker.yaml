@@ -14,7 +14,13 @@ spec:
       containers:
         - name: open-ocr-worker
           image: tleyden5iwx/open-ocr
+          env:
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-mq-password
+                  key: password
           command:
             - open-ocr-worker
-            - "-amqp_uri=amqp://admin:rabbit-1f2d1e2e67df@rabbitmq-service/"
+            - -amqp_uri=amqp://admin:$(RABBITMQ_PASSWORD)@rabbitmq-service/
 

@@ -10,11 +10,14 @@ spec:
     -
       env:
         - name: RABBITMQ_PASSWORD
-          value: rabbit-1f2d1e2e67df
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-mq-password
+              key: password
       command: 
         - /usr/bin/open-ocr-httpd
         - -amqp_uri=amqp://admin:$(RABBITMQ_PASSWORD)@rabbitmq-service/
-        - "-http_port=8080"
+        - -http_port=8080
       image: tleyden5iwx/open-ocr
       name: open-ocr-httpd
       ports: 
