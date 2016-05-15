@@ -10,7 +10,10 @@ spec:
       image: tutum/rabbitmq
       env:
         - name: RABBITMQ_PASS
-          value: rabbit-1f2d1e2e67df
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-mq-password
+              key: password
       ports:
         - name: userport
           containerPort: 5672
