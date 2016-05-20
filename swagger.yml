@@ -1,0 +1,99 @@
+---
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: OpenOCR API
+paths:
+  /ocr:
+    post:
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: order placed for purchasing the pet
+          required: true
+          schema:
+            $ref: "#/definitions/DecodeOCR"
+      responses:
+        200:
+          description: OK
+definitions:
+  DecodeOCR:
+    type: object
+    description: OCR processing request to convert an image into text
+    properties:
+      img_url:
+        type: string
+        description: The URL of the image to process.
+      engine:
+        type: string
+        description: The OCR engine to use
+        enum:
+          - tesseract
+          - go_tesseract
+          - mock
+      inplace_decode:
+        type: boolean
+        description: If true, will attempt to do ocr decode in-place rather than queuing a message on RabbitMQ for worker processing.  Useful for local testing, not recommended for production.
+      engine_args:
+        type: object
+        description: The OCR engine arguments to pass (engine-specific)
+        properties:
+          config_vars:
+            type: string
+            description: Config vars - equivalent of -c args to tesseract
+          psm:
+            type: string
+            description: Page Segment Mode, equivalent of -psm arg to tesseract.  To use default, omit this field from the JSON.
+            enum:
+              - 0
+              - 1
+              - 2
+              - 3
+              - 4
+              - 5
+              - 6
+              - 7
+              - 8
+              - 9
+              - 10
+          lang:
+            type: string
+            description: The language to use.  If omitted, will use English
+            enum:
+              - eng
+              - ara
+              - bel
+              - ben
+              - bul
+              - ces
+              - dan
+              - deu
+              - ell
+              - fin
+              - fra
+              - heb
+              - hin
+              - ind
+              - isl
+              - ita
+              - jpn
+              - kor
+              - nld
+              - nor
+              - pol
+              - por
+              - ron
+              - rus
+              - spa
+              - swe
+              - tha
+              - tur
+              - ukr
+              - vie
+              - chi-sim
+              - chi-tra
+              
+          
+        
