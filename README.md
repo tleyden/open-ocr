@@ -9,6 +9,8 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 
 [Docker](http://www.docker.io) is used to containerize the various components of the service.
 
+To try it out before you install it, you can [access a live demo on the 21 marketplace]( https://github.com/tleyden/open-ocr/wiki/Trying-out-OpenOCR-on-the-21-Marketplace)
+
 ![screenshot](http://tleyden-misc.s3.amazonaws.com/blog_images/openocr-architecture.png)
 
 # Features
