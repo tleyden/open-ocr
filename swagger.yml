@@ -2,7 +2,16 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: OpenOCR API
+  title: OpenOCR 
+  description: OpenOCR is a wrapper around Tesseract easily deployable as a service
+  contact:
+    name: Traun Leyden
+    email: traun.leyden@gmail.com
+  license:
+     name: Apache2 License
+schemes:
+  - http
+basePath: /
 paths:
   /ocr:
     post:
@@ -11,7 +20,7 @@ paths:
       parameters:
         - in: body
           name: body
-          description: order placed for purchasing the pet
+          description: Pass image url and other info to decode image to text via OCR
           required: true
           schema:
             $ref: "#/definitions/DecodeOCR"
