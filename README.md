@@ -167,6 +167,11 @@ The supplied `docs/upload-local-file.sh` provides an example of how to upload a 
 * Follow [@OpenOCR](https://twitter.com/openocr) on Twitter
 * Checkout the [Github issue tracker](https://github.com/tleyden/open-ocr/issues)
 
+# Client Libraries
+
+* **Go** [open-ocr-client](https://github.com/tleyden/open-ocr-client)
+* **C#** [open-ocr-dotnet](https://github.com/alex-doe/open-ocr-dotnet)
+
 # License
 
 OpenOCR is Open Source and available under the Apache 2 License.
