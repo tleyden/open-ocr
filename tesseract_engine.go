@@ -1,6 +1,7 @@
 package ocrworker
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -99,6 +100,8 @@ func (t TesseractEngine) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error
 	tmpFileName, err := func() (string, error) {
 		if ocrRequest.ImgUrl != "" {
 			return t.tmpFileFromImageUrl(ocrRequest.ImgUrl)
+		} else if ocrRequest.ImageBase64 != "" {
+			return t.tmpFileFromImageBase64(ocrRequest.ImgBase64)
 		} else {
 			return t.tmpFileFromImageBytes(ocrRequest.ImgBytes)
 		}
@@ -134,6 +137,29 @@ func (t TesseractEngine) tmpFileFromImageBytes(imgBytes []byte) (string, error) 
 	// we have to write the contents of the image url to a temp
 	// file, because the leptonica lib can't seem to handle byte arrays
 	err = saveBytesToFileName(imgBytes, tmpFileName)
+	if err != nil {
+		return "", err
+	}
+
+	return tmpFileName, nil
+
+}
+
+func (t TesseractEngine) tmpFileFromImageBase64(base64Image string) (string, error) {
+
+	tmpFileName, err := createTempFileName()
+	if err != nil {
+		return "", err
+	}
+
+	// decoding into bytes the base64 string
+	decoded, decodeError := base64.StdEncoding.DecodeString(data)
+
+	if decodeError != nil {
+		return "", err
+	}
+
+	err = saveBytesToFileName(decoded, tmpFileName)
 	if err != nil {
 		return "", err
 	}
