@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/couchbaselabs/logg"
-	"github.com/tleyden/open-ocr"
+	"github.com/speedfl/open-ocr"
 )
 
 // This assumes that there is a worker running
