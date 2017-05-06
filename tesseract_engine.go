@@ -129,6 +129,8 @@ func (t TesseractEngine) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error
 
 func (t TesseractEngine) tmpFileFromImageBytes(imgBytes []byte) (string, error) {
 
+	logg.LogTo("OCR_TESSERACT", "Use tesseract with bytes image")
+
 	tmpFileName, err := createTempFileName()
 	if err != nil {
 		return "", err
@@ -146,6 +148,8 @@ func (t TesseractEngine) tmpFileFromImageBytes(imgBytes []byte) (string, error) 
 }
 
 func (t TesseractEngine) tmpFileFromImageBase64(base64Image string) (string, error) {
+
+	logg.LogTo("OCR_TESSERACT", "Use tesseract with base 64")
 
 	tmpFileName, err := createTempFileName()
 	if err != nil {
@@ -169,6 +173,8 @@ func (t TesseractEngine) tmpFileFromImageBase64(base64Image string) (string, err
 }
 
 func (t TesseractEngine) tmpFileFromImageUrl(imgUrl string) (string, error) {
+
+	logg.LogTo("OCR_TESSERACT", "Use tesseract with url")
 
 	tmpFileName, err := createTempFileName()
 	if err != nil {

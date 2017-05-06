@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/couchbaselabs/logg"
-	"github.com/nu7hatch/gouuid"
 	"github.com/streadway/amqp"
 )
 
@@ -87,7 +86,7 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 	// any preprocessors.  if rabbitmq isn't in same data center
 	// as open-ocr, it will be expensive in terms of bandwidth
 	// to have image binary in messages
-	if ocrRequest.ImgBytes == nil {
+	if ocrRequest.ImgBytes == nil && ocrRequest.ImgBase64 == nil {
 		// if we already have image bytes, ignore image url
 		err = ocrRequest.downloadImgUrl()
 		if err != nil {
