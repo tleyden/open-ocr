@@ -153,7 +153,7 @@ func (t TesseractEngine) tmpFileFromImageBase64(base64Image string) (string, err
 	}
 
 	// decoding into bytes the base64 string
-	decoded, decodeError := base64.StdEncoding.DecodeString(data)
+	decoded, decodeError := base64.StdEncoding.DecodeString(base64Image)
 
 	if decodeError != nil {
 		return "", err
