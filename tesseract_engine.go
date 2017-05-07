@@ -98,10 +98,10 @@ func (t TesseractEngineArgs) Export() []string {
 func (t TesseractEngine) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error) {
 
 	tmpFileName, err := func() (string, error) {
-		if ocrRequest.ImgUrl != "" {
-			return t.tmpFileFromImageUrl(ocrRequest.ImgUrl)
-		} else if ocrRequest.ImgBase64 != "" {
+		if ocrRequest.ImgBase64 != "" {
 			return t.tmpFileFromImageBase64(ocrRequest.ImgBase64)
+		} else if ocrRequest.ImgUrl != "" {
+			return t.tmpFileFromImageUrl(ocrRequest.ImgUrl)
 		} else {
 			return t.tmpFileFromImageBytes(ocrRequest.ImgBytes)
 		}

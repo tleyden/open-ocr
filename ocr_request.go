@@ -1,6 +1,7 @@
 package ocrworker
 
 import "fmt"
+import "encoding/base64"
 
 type OcrRequest struct {
 	ImgUrl            string                 `json:"img_url"`
@@ -27,7 +28,25 @@ func (ocrRequest *OcrRequest) nextPreprocessor(processorRoutingKey string) strin
 		ocrRequest.PreprocessorChain = s
 		return x
 	}
+}
 
+func (ocrRequest *OcrRequest) decodeBase64() error {
+
+	bytes, decodeError := base64.StdEncoding.DecodeString(ocrRequest.ImgBase64)
+
+	if decodeError != nil {
+		return decodeError
+	}
+
+	ocrRequest.ImgBytes = bytes
+	ocrRequest.ImgBase64 = ""
+
+	return nil
+}
+
+func (ocrRequest *OcrRequest) hasBase64() error {
+
+	return ocrRequest.ImgBase64 != ""
 }
 
 func (ocrRequest *OcrRequest) downloadImgUrl() error {
