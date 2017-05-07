@@ -44,7 +44,7 @@ func (ocrRequest *OcrRequest) decodeBase64() error {
 	return nil
 }
 
-func (ocrRequest *OcrRequest) hasBase64() error {
+func (ocrRequest *OcrRequest) hasBase64() bool {
 
 	return ocrRequest.ImgBase64 != ""
 }
