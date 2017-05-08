@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-
-	"github.com/couchbaselabs/logg"
 	"github.com/nu7hatch/gouuid"
+	"github.com/couchbaselabs/logg"
 	"github.com/streadway/amqp"
 )
 
@@ -88,11 +87,24 @@ func (c *OcrRpcClient) DecodeImage(ocrRequest OcrRequest) (OcrResult, error) {
 	// as open-ocr, it will be expensive in terms of bandwidth
 	// to have image binary in messages
 	if ocrRequest.ImgBytes == nil {
-		// if we already have image bytes, ignore image url
-		err = ocrRequest.downloadImgUrl()
-		if err != nil {
-			logg.LogTo("OCR_CLIENT", "Error downloading img url: %v", err)
-			return OcrResult{}, err
+
+		// if we do not have bytes use base 64 file by converting it to bytes
+		if ocrRequest.hasBase64() {
+
+			logg.LogTo("OCR_CLIENT", "OCR request has base 64 convert it to bytes")
+
+			err = ocrRequest.decodeBase64()
+			if err != nil {
+				logg.LogTo("OCR_CLIENT", "Error decoding base64: %v", err)
+				return OcrResult{}, err
+			}
+		} else {
+			// if we do not have base 64 or bytes download the file
+			err = ocrRequest.downloadImgUrl()
+			if err != nil {
+				logg.LogTo("OCR_CLIENT", "Error downloading img url: %v", err)
+				return OcrResult{}, err
+			}
 		}
 	}
 

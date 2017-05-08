@@ -1,6 +1,7 @@
 package ocrworker
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -97,7 +98,9 @@ func (t TesseractEngineArgs) Export() []string {
 func (t TesseractEngine) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error) {
 
 	tmpFileName, err := func() (string, error) {
-		if ocrRequest.ImgUrl != "" {
+		if ocrRequest.ImgBase64 != "" {
+			return t.tmpFileFromImageBase64(ocrRequest.ImgBase64)
+		} else if ocrRequest.ImgUrl != "" {
 			return t.tmpFileFromImageUrl(ocrRequest.ImgUrl)
 		} else {
 			return t.tmpFileFromImageBytes(ocrRequest.ImgBytes)
@@ -126,6 +129,8 @@ func (t TesseractEngine) ProcessRequest(ocrRequest OcrRequest) (OcrResult, error
 
 func (t TesseractEngine) tmpFileFromImageBytes(imgBytes []byte) (string, error) {
 
+	logg.LogTo("OCR_TESSERACT", "Use tesseract with bytes image")
+
 	tmpFileName, err := createTempFileName()
 	if err != nil {
 		return "", err
@@ -142,7 +147,34 @@ func (t TesseractEngine) tmpFileFromImageBytes(imgBytes []byte) (string, error) 
 
 }
 
+func (t TesseractEngine) tmpFileFromImageBase64(base64Image string) (string, error) {
+
+	logg.LogTo("OCR_TESSERACT", "Use tesseract with base 64")
+
+	tmpFileName, err := createTempFileName()
+	if err != nil {
+		return "", err
+	}
+
+	// decoding into bytes the base64 string
+	decoded, decodeError := base64.StdEncoding.DecodeString(base64Image)
+
+	if decodeError != nil {
+		return "", err
+	}
+
+	err = saveBytesToFileName(decoded, tmpFileName)
+	if err != nil {
+		return "", err
+	}
+
+	return tmpFileName, nil
+
+}
+
 func (t TesseractEngine) tmpFileFromImageUrl(imgUrl string) (string, error) {
+
+	logg.LogTo("OCR_TESSERACT", "Use tesseract with url")
 
 	tmpFileName, err := createTempFileName()
 	if err != nil {
