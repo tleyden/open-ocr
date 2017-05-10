@@ -19,29 +19,57 @@ cleanContainer()
 }
 
 #===================================================================
+# check and clean
+#===================================================================
+checkAndCleanImage()
+{
+	IMAGE_TO_CHECK=$(docker images | grep "$1")
+	if [ "$IMAGE_TO_CHECK" != "" ]
+	then
+		echo
+		echo "$1 has been found. Do you want to clean it?"
+		echo
+		read -p "Choose y/n: " CHOICE
+		
+		if [ $CHOICE == "y" ]
+		then
+			cleanImage $1
+		elif [ $CHOICE == "n" ]
+		then 
+			echo
+			echo "Keep $1"
+			echo
+		else
+			echo
+			echo "Wrong choice please retry"
+			checkAndCleanImage $1
+		fi
+	else
+        	echo "$1 Not present"
+		echo
+	fi
+
+}
+
+#===================================================================
 # clean docker images
 #===================================================================
 cleanImage()
 {
-	IMAGE_TO_CLEAN=$(docker images | grep "$1")
-	if [ "$IMAGE_TO_CLEAN" != "" ]
-	then
-		echo "Cleaning $IMAGE_TO_CLEAN image"
-		docker rmi $IMAGE_TO_CLEAN
-	else
-        echo "$1 already cleaned"
-	fi
-
+	echo "Cleaning $1 image"
+	docker rmi $1
+	echo "$1 has been cleaned"
 }
 
 
 # first remove all the docker container and docker images related to the project
 cleanContainer
-cleanImage "tleyden5iwx/open-ocr"
-cleanImage "tleyden5iwx/open-ocr-2"
-cleanImage "ubuntu"
-cleanImage "tleyden5iwx/open-ocr-preprocessor"
-cleanImage "tleyden5iwx/stroke-width-transform" 
+
+# put a space as we open-ocr and open-ocr-2 will match on open-ocr grep
+checkAndCleanImage "tleyden5iwx/open-ocr "
+checkAndCleanImage "tleyden5iwx/open-ocr-2 "
+checkAndCleanImage "tleyden5iwx/rabbitmq"
+checkAndCleanImage "tleyden5iwx/open-ocr-preprocessor"
 
 echo
 echo "Which version of the OCR do you want to deploy: "
