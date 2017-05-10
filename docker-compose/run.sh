@@ -68,6 +68,4 @@ fi
 
 export OPEN_OCR_INSTANCE=$OPEN_OCR_INSTANCE_NAME
 
-cd docker-compose/
-
 sudo docker-compose up
