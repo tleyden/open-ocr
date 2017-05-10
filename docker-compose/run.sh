@@ -55,7 +55,7 @@ OPEN_OCR_INSTANCE_NAME=""
 
 if [ "$OPEN_OCR_VERSION" == 1 ]
 then
-	echo "Open ocr instance name will be open-ocr-1"
+	echo "Open ocr instance name will be open-ocr"
 	OPEN_OCR_INSTANCE_NAME="open-ocr"
 elif [ "$OPEN_OCR_VERSION" == 2 ]
 then
