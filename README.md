@@ -59,7 +59,7 @@ The ip address `10.0.2.15` will be used as the `RABBITMQ_HOST` env variable belo
  * [Install docker](https://docs.docker.com/installation/)
  * [Install docker-compose](https://docs.docker.com/compose/)
  * `git clone https://github.com/tleyden/open-ocr.git`
- * cd open-ocr/docker-compose
+ * `cd open-ocr/docker-compose`
  * Type ```./run.sh ``` (in case you don't have execute right type ```sudo chmod +x run.sh```
  * The runner will ask you if you want to delete the images (choose y or n for each)
  * The runner will ask you to choose between version 1 and 2
