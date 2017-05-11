@@ -94,6 +94,20 @@ else
 	exit
 fi
 
+echo
+echo "Do you want to start it as deamon?"
+echo
+
+read -p "Choose 'y' for yes or anyother for no: " CHOICE_DEAMON
+
+DEAMON_OPTION=""
+
+if [ "$CHOICE_DEAMON" == "y" ]
+then
+	echo "Use deamon option -d"
+	DEAMON_OPTION="-d"
+fi
+
 export OPEN_OCR_INSTANCE=$OPEN_OCR_INSTANCE_NAME
 
-sudo -E docker-compose up
+sudo -E docker-compose up $DEAMON_OPTION

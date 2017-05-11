@@ -66,6 +66,21 @@ The ip address `10.0.2.15` will be used as the `RABBITMQ_HOST` env variable belo
    * Version 2 is using the ocr Tesseract 4.00. The memory usage is light. It is less fast than tesseract 3 and more costly in term of size (an simple aws instance with 1GB of ram is sufficient but with an EBS of 16GB of storage). Result are really better compared to version 3.04.
    * To see a comparative you can have a look to the [official page of tesseract](https://github.com/tesseract-ocr/tesseract/wiki/4.0-Accuracy-and-Performance)
 
+
+**You can use the docker-compose without the run.sh. For this just do:**
+
+```
+# for v1
+export OPEN_OCR_INSTANCE=open-ocr
+
+# for v2
+export OPEN_OCR_INSTANCE=open-ocr-2
+
+# then up (with -d to start it as deamon)
+docker-compose up
+
+```
+
 Docker Compose will start four docker instances
 
 * [RabbitMQ](https://index.docker.io/u/tutum/rabbitmq/)
