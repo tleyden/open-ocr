@@ -54,14 +54,33 @@ eth0      Link encap:Ethernet  HWaddr 08:00:27:43:40:c7
 The ip address `10.0.2.15` will be used as the `RABBITMQ_HOST` env variable below.
 
 
-# Launching OpenOCR with Docker Compose on Linux
+# Launching OpenOCR command run.sh
 
  * [Install docker](https://docs.docker.com/installation/)
  * [Install docker-compose](https://docs.docker.com/compose/)
  * Checkout OpenOCR repository or at least copy all files and subdirectories from OpenOCR `docker-compose` directory
- * cd docker-compose directory
- * run `docker-compose up` to see the log in console or `docker-compose up -d` to run containers as daemons
- 
+ * Type ```./run.sh ``` (in case you don't have execute right type ```sudo chmod +x run.sh```
+ * The runner will ask you if you want to delete the images (choose y or n for each)
+ * The runner will ask you to choose between version 1 and 2
+   * Version 1 is using the ocr Tesseract 3.04. The memory usage is light. It is pretty fast and not costly in term of size (a simple aws instance with 1GB of ram and 8GB of storage is sufficiant). Result are acceptable
+   * Version 2 is using the ocr Tesseract 4.00. The memory usage is light. It is less fast than tesseract 3 and more costly in term of size (an simple aws instance with 1GB of ram is sufficient but with an EBS of 16GB of storage). Result are really better compared to version 3.04.
+   * To see a comparative you can have a look to the [official page of tesseract](https://github.com/tesseract-ocr/tesseract/wiki/4.0-Accuracy-and-Performance)
+
+
+**You can use the docker-compose without the run.sh. For this just do:**
+
+```
+# for v1
+export OPEN_OCR_INSTANCE=open-ocr
+
+# for v2
+export OPEN_OCR_INSTANCE=open-ocr-2
+
+# then up (with -d to start it as deamon)
+docker-compose up
+
+```
+
 Docker Compose will start four docker instances
 
 * [RabbitMQ](https://index.docker.io/u/tutum/rabbitmq/)
@@ -119,6 +138,8 @@ below I have used a few variations that work for variable names.
  
 # Test the REST API 
 
+## With image url
+
 **Request**
 
 ```
@@ -142,7 +163,17 @@ below I have used a few variations that work for variable names.
 
 ```
 
-The REST API also supports:
+## With image base64
+
+
+**Request**
+
+```
+$ curl -X POST -H "Content-Type: application/json" -d '{"img_base64":"<YOUR BASE 64 HERE>","engine":"tesseract"}' http://10.0.2.15:$HTTP_PORT/ocr
+```
+
+
+## The REST API also supports:
 
 * Uploading the image content via `multipart/related`, rather than passing an image URL.  (example client code provided in the [Go REST client](http://github.com/tleyden/open-ocr-client))
 * Tesseract config vars (eg, equivalent of -c arguments when using Tesseract via the command line) and Page Seg Mode 
