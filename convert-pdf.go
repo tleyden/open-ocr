@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"github.com/couchbaselabs/logg"
 	"io/ioutil"
+	"os"
 	"os/exec"
 )
 
@@ -26,14 +27,14 @@ func (c ConvertPdf) preprocess(ocrRequest *OcrRequest) error {
 	if err != nil {
 		return err
 	}
-	//defer os.Remove(tmpFileNameInput)
+	defer os.Remove(tmpFileNameInput)
 
 	tmpFileNameOutput, err := createTempFileName()
 	tmpFileNameOutput = fmt.Sprintf("%s.tif", tmpFileNameOutput)
 	if err != nil {
 		return err
 	}
-	//defer os.Remove(tmpFileNameOutput)
+	defer os.Remove(tmpFileNameOutput)
 
 	err = saveBytesToFileName(ocrRequest.ImgBytes, tmpFileNameInput)
 	if err != nil {
