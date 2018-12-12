@@ -17,6 +17,7 @@ The heavy lifting OCR work is handled by [Tesseract OCR](https://code.google.com
 * [Kubernetes support](https://github.com/tleyden/open-ocr/tree/master/kubernetes): workers can run in a Kubernetes Replication Controller
 * Supports 31 languages in addition to English 
 * Ability to use an image pre-processing chain.  An example using [Stroke Width Transform](https://github.com/tleyden/open-ocr/wiki/Stroke-Width-Transform) is provided.
+* PDF support via a [PDF preprocessor](https://github.com/tleyden/open-ocr/pull/108) 
 * Pass arguments to Tesseract such as character whitelist and page segment mode.
 * [REST API docs](http://docs.openocr.apiary.io/)
 * A [Go REST client](http://github.com/tleyden/open-ocr-client) is available.
