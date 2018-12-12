@@ -26,12 +26,13 @@ const preprocessor_tag = "preprocessor" // TODO: should be unique for each worke
 func NewPreprocessorRpcWorker(rc RabbitConfig, preprocessor string) (*PreprocessorRpcWorker, error) {
 
 	preprocessorMap := make(map[string]Preprocessor)
-	preprocessorMap[PREPROCESSOR_STROKE_WIDTH_TRANSFORM] = StrokeWidthTransformer{}
-	preprocessorMap[PREPROCESSOR_IDENTITY] = IdentityPreprocessor{}
+	preprocessorMap[PreprocessorStrokeWidthTransform] = StrokeWidthTransformer{}
+	preprocessorMap[PreprocessorIdentity] = IdentityPreprocessor{}
+	preprocessorMap[PreprocessorConvertPdf] = ConvertPdf{}
 
 	_, ok := preprocessorMap[preprocessor]
 	if !ok {
-		return nil, fmt.Errorf("No preprocessor found for: %q", preprocessor)
+		return nil, fmt.Errorf("no preprocessor found for: %q", preprocessor)
 	}
 
 	preprocessorRpcWorker := &PreprocessorRpcWorker{
@@ -71,11 +72,11 @@ func (w PreprocessorRpcWorker) Run() error {
 	if err = w.channel.ExchangeDeclare(
 		w.rabbitConfig.Exchange,     // name of the exchange
 		w.rabbitConfig.ExchangeType, // type
-		true,  // durable
-		false, // delete when complete
-		false, // internal
-		false, // noWait
-		nil,   // arguments
+		true,                        // durable
+		false,                       // delete when complete
+		false,                       // internal
+		false,                       // noWait
+		nil,                         // arguments
 	); err != nil {
 		return err
 	}
@@ -100,8 +101,8 @@ func (w PreprocessorRpcWorker) Run() error {
 		queue.Name,              // name of the queue
 		w.bindingKey,            // bindingKey
 		w.rabbitConfig.Exchange, // sourceExchange
-		false, // noWait
-		nil,   // arguments
+		false,                   // noWait
+		nil,                     // arguments
 	); err != nil {
 		return err
 	}
@@ -128,7 +129,7 @@ func (w PreprocessorRpcWorker) Run() error {
 func (w *PreprocessorRpcWorker) Shutdown() error {
 	// will close() the deliveries channel
 	if err := w.channel.Cancel(w.tag, true); err != nil {
-		return fmt.Errorf("Worker cancel failed: %s", err)
+		return fmt.Errorf("worker cancel failed: %s", err)
 	}
 
 	if err := w.conn.Close(); err != nil {
@@ -231,7 +232,7 @@ func (w *PreprocessorRpcWorker) handleDelivery(d amqp.Delivery) error {
 	ocrRequest := OcrRequest{}
 	err := json.Unmarshal(d.Body, &ocrRequest)
 	if err != nil {
-		msg := "Error unmarshaling json: %v.  Error: %v"
+		msg := "Error unmarshalling json: %v.  Error: %v"
 		errMsg := fmt.Sprintf(msg, string(d.Body), err)
 		logg.LogError(fmt.Errorf(errMsg))
 		return err
