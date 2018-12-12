@@ -47,9 +47,7 @@ func (c ConvertPdf) preprocess(ocrRequest *OcrRequest) error {
 		tmpFileNameInput,
 		tmpFileNameOutput,
 	)
-	/*
-	   gs -dQUIET -o Antrag.tif -sDEVICE=tiffg4 Antrag.pdf
-	*/
+
 	var gsArgs []string
 	gsArgs = append(gsArgs,
 		"-dQUIET",
