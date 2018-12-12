@@ -74,7 +74,7 @@ func (s StrokeWidthTransformer) extractDarkOnLightParam(ocrRequest OcrRequest) s
 	val := "1"
 
 	preprocessorArgs := ocrRequest.PreprocessorArgs
-	swtArgs := preprocessorArgs[PREPROCESSOR_STROKE_WIDTH_TRANSFORM]
+	swtArgs := preprocessorArgs[PreprocessorStrokeWidthTransform]
 	if swtArgs != nil {
 		swtArg, ok := swtArgs.(string)
 		if ok && (swtArg == "0" || swtArg == "1") {
