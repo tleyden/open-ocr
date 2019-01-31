@@ -184,6 +184,13 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"img_base64":"<YOUR BASE
 
 See the [REST API docs](http://docs.openocr.apiary.io/) and the [Go REST client](http://github.com/tleyden/open-ocr-client) for details.
 
+# Client Libraries
+
+These client libraries make it easier to invoke the REST API:
+
+* **Go** [open-ocr-client](https://github.com/tleyden/open-ocr-client)
+* **C#** [open-ocr-dotnet](https://github.com/alex-doe/open-ocr-dotnet)
+* **Java** [open-ocr-java](https://github.com/faLekGG/JavaOpenOCR)
 
 # Uploading local files using curl
 
@@ -198,10 +205,6 @@ The supplied `docs/upload-local-file.sh` provides an example of how to upload a 
 * Follow [@OpenOCR](https://twitter.com/openocr) on Twitter
 * Checkout the [Github issue tracker](https://github.com/tleyden/open-ocr/issues)
 
-# Client Libraries
-
-* **Go** [open-ocr-client](https://github.com/tleyden/open-ocr-client)
-* **C#** [open-ocr-dotnet](https://github.com/alex-doe/open-ocr-dotnet)
 
 # License
 
