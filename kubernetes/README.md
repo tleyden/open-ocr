@@ -3,6 +3,8 @@ OpenOCR runs on Kubernetes!
 
 * [Instructions to run on Google Container Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Container-Engine)
 
+* [Instructions to run on Azure Kubernetes Service](https://github.com/tleyden/open-ocr/wiki/Installation-on-Azure-Kubernetes-Service)
+
 If you want to run it on a different Kubernetes provider, particularly on ones that don't offer the `Type: LoadBalancer` support for Kubernetes Service definitions, you will need to change the [open-ocr-httpd service](https://github.com/tleyden/open-ocr/blob/master/kubernetes/services/open_ocr_httpd.yml) accordingly.
 
 # Quick Start
