@@ -30,6 +30,7 @@ OpenOCR can easily run on any PAAS that supports Docker containers.  Here are th
 * [Launch on Google Container Engine GKE - Kubernetes](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Container-Engine)
 * [Launch on AWS with CoreOS](https://github.com/tleyden/open-ocr/wiki/Installation-on-CoreOS-Fleet)
 * [Launch on Google Compute Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Compute-Engine)
+* [Launch on Azure Kubernetes Service](https://github.com/tleyden/open-ocr/wiki/Installation-on-Azure-Kubernetes-Service)
 
 If your preferred PAAS isn't listed, please open a [Github issue](https://github.com/tleyden/open-ocr/issues) to request instructions.
 
