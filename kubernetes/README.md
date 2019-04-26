@@ -1,5 +1,4 @@
-
-OpenOCR runs on Kubernetes!
+# OpenOCR runs on Kubernetes!
 
 * [Instructions to run on Google Container Engine](https://github.com/tleyden/open-ocr/wiki/Installation-on-Google-Container-Engine)
 
