@@ -7,7 +7,44 @@ OpenOCR runs on Kubernetes!
 
 If you want to run it on a different Kubernetes provider, particularly on ones that don't offer the `Type: LoadBalancer` support for Kubernetes Service definitions, you will need to change the [open-ocr-httpd service](https://github.com/tleyden/open-ocr/blob/master/kubernetes/services/open_ocr_httpd.yml) accordingly.
 
-# Quick Start
+# Quick Start - Automated
+
+You can use the `bootstrap.sh` script found on this directory to automate all of the steps described below.
+
+```
+curl -O bootstrap.sh https://raw.githubusercontent.com/dcasati/open-ocr/dcasati-azure-demo/kubernetes/bootstrap.sh
+chmod +x bootstrap.sh
+```
+
+Using the provided script:
+
+```
+usage: bootstrap.sh [-cit]
+
+Options:
+    -c     clean up the demo.
+    -i     install the demo.
+    -t     run a cURL test against the API.
+```
+
+To install the demo:
+```
+bootstrap.sh -i
+```
+
+To test the REST API
+
+```
+bootstrap.sh -t
+```
+
+Finally, to clean up all of the resources from the Kubernetes cluster
+
+```
+bootstrap.sh -c
+```
+
+# Quick Start - Manual
 
 ## Create RabbitMQ password
 
