@@ -103,6 +103,10 @@ definitions:
               - vie
               - chi-sim
               - chi-tra
-              
-          
-        
+          output_format:
+            type: string
+            description: The format type of output.  If omitted, will use simple text
+            enum:
+              - tsv
+              - pdf
+              - hocr

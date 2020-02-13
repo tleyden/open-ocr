@@ -15,9 +15,10 @@ type TesseractEngine struct {
 }
 
 type TesseractEngineArgs struct {
-	configVars  map[string]string `json:"config_vars"`
-	pageSegMode string            `json:"psm"`
-	lang        string            `json:"lang"`
+	configVars   map[string]string `json:"config_vars"`
+	pageSegMode  string            `json:"psm"`
+	lang         string            `json:"lang"`
+	outputFormat string            `json:"output_format"`
 }
 
 func NewTesseractEngineArgs(ocrRequest OcrRequest) (*TesseractEngineArgs, error) {
@@ -70,6 +71,16 @@ func NewTesseractEngineArgs(ocrRequest OcrRequest) (*TesseractEngineArgs, error)
 		engineArgs.lang = langStr
 	}
 
+	// output format
+	outputFormat := ocrRequest.EngineArgs["output_format"]
+	if outputFormat != nil {
+		outputFormatStr, ok := outputFormat.(string)
+		if !ok {
+			return nil, fmt.Errorf("Could not convert output_format into string: %v", outputFormat)
+		}
+		engineArgs.outputFormat = outputFormatStr
+	}
+
 	return engineArgs, nil
 
 }
@@ -90,6 +101,9 @@ func (t TesseractEngineArgs) Export() []string {
 	if t.lang != "" {
 		result = append(result, "-l")
 		result = append(result, t.lang)
+	}
+	if t.outputFormat != "" {
+		result = append(result, t.outputFormat)
 	}
 
 	return result
@@ -198,7 +212,7 @@ func (t TesseractEngine) processImageFile(inputFilename string, engineArgs Tesse
 	tmpOutFileBaseName := inputFilename
 
 	// possible file extensions
-	fileExtensions := []string{"txt", "hocr"}
+	fileExtensions := []string{"txt", "hocr", "tsv"}
 
 	// build args array
 	cflags := engineArgs.Export()
