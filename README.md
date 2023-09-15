@@ -65,7 +65,7 @@ The ip address `10.0.2.15` will be used as the `RABBITMQ_HOST` env variable belo
  * Type ```./run.sh ``` (in case you don't have execute right type ```sudo chmod +x run.sh```
  * The runner will ask you if you want to delete the images (choose y or n for each)
  * The runner will ask you to choose between version 1 and 2
-   * Version 1 is using the ocr Tesseract 3.04. The memory usage is light. It is pretty fast and not costly in term of size (a simple aws instance with 1GB of ram and 8GB of storage is sufficiant). Result are acceptable
+   * Version 1 is using the ocr Tesseract 3.04. The memory usage is light. It is pretty fast and not costly in term of size (a simple aws instance with 1GB of ram and 8GB of storage is sufficient). Result are acceptable
    * Version 2 is using the ocr Tesseract 4.00. The memory usage is light. It is less fast than tesseract 3 and more costly in term of size (an simple aws instance with 1GB of ram is sufficient but with an EBS of 16GB of storage). Result are really better compared to version 3.04.
    * To see a comparative you can have a look to the [official page of tesseract](https://github.com/tesseract-ocr/tesseract/wiki/4.0-Accuracy-and-Performance)
 
